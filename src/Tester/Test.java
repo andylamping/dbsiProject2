@@ -133,7 +133,7 @@ public class Test {
 				// and if there are, we want to build them before we query
 				ArrayList<Integer> buildIndexes = new ArrayList<Integer>();
 				int x = 1;
-				while(x < args.length - 2){
+				while(x < args.length){
 					if(args[x].contains("-b")){
 						int indexToBuild = Integer.parseInt(args[x].substring(args.length-1));
 						buildIndexes.add(indexToBuild);
