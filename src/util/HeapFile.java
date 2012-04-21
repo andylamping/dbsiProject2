@@ -315,20 +315,20 @@ public class HeapFile extends MyFile{
 
 		return result.substring(0, result.length()-1);
 	}
-	
+
 	public String getRecordByRIDFromHeapFile(Integer RID){
 		String result = "";
-		
+
 		byte[] val;
 		Comparer comparer = new Comparer();
-		
+
 		long position = this.currentFileOffset + this.numberOfBytesPerRecord * RID;
 		for(int i = 0; i<this.schemaArray.length; i++){
 			val = comparer.compare_functions[schemaArray[i]].read(this.path,(int) position, this.lengthArray[i]);
 			result += comparer.compare_functions[schemaArray[i]].readString(this.path,(int) position, this.lengthArray[i]) + ",";
 			position += val.length;
 		}
-		
+
 		result = result.substring(0, result.length()-1)+"\n";
 		return result;
 	}
@@ -468,5 +468,120 @@ public class HeapFile extends MyFile{
 		return total;
 	}
 
+	/*
+	 * Accepts the column number and builds the 
+	 * index on the column number.
+	 */
+	public void buildIndexOnColumn(Integer columnNumber){
+
+		// Get header information from the heap file.
+		this.getHeaderInformationFromFile();
+		// Translate the columnNumber to a datatype
+		String dataType = this.schema.split(",")[columnNumber-1];
+
+		if (indexExistsOnColumn(columnNumber)){
+			// If Index already exists on the given column number.
+
+		}else{
+			// If Index doesn't exist on the given column number.
+			setIndexOnColumn(columnNumber);
+			updateIndexData(indexData);
+			// Create a new index.
+
+			IndexFile iFile = new IndexFile(path+ "." +columnNumber+".lht", path+"."+columnNumber+".lho", dataType);
+			iFile.writeHeaderInformationToFile();
+			iFile.writeInitialBucketsToFile();
+
+			String currentRecord ;
+			Object data;
+			long currentRecordPointer = this.currentFileOffset;
+			for (int i= 0 ;i < this.numberOfRecords; i++){
+				currentRecord = this.getRecordFromHeapFile();
+				data = getAppropriateData(currentRecord, columnNumber,dataType);
+				if (data == null){
+					if (Config.DEBUG) System.out.println("Data reading problem");
+				}
+				iFile.writeToIndexFile(data, currentRecordPointer);
+				currentRecordPointer += numberOfBytesPerRecord;
+			}
+
+
+
+		}
+
+	}
+
+
+	private Object getAppropriateData(String currentRecord, Integer columnNumber ,String dataType) {
+		int length = Integer.parseInt(dataType.substring(1));
+		char type = dataType.charAt(0);
+
+		Object retValue = null;
+		String dataToBeReturned = currentRecord.split(",")[columnNumber -1];
+
+		switch (type) {
+		case 'c':
+			// If data is a string, we return it as it is.
+			retValue = dataToBeReturned;
+			break;
+
+		case 'i':
+			// If data is an Integer 
+				switch (length) {
+				case 1:
+					retValue = Byte.parseByte(dataToBeReturned);
+					break;
+					
+				case 2:
+					retValue = Short.parseShort(dataToBeReturned);
+					break;
+	
+				case 4:
+					retValue = Integer.parseInt(dataToBeReturned);
+					break;
+	
+				case 8:
+					retValue = Long.parseLong(dataToBeReturned);
+					break;
+	
+				default:
+					break;
+				}
+			break;
+
+		case 'r':
+			switch (length) {
+			case 4:
+				retValue = Float.parseFloat(dataToBeReturned);
+				break;
+			
+			case 8:
+				retValue = Double.parseDouble(dataToBeReturned);
+			default:
+				break;
+			}
+			break;
+		default:
+			break;
+		}
+		
+		return retValue;
+	}
+
+
+	private void setIndexOnColumn(Integer columnNumber) {
+		indexData[columnNumber] = 1;
+	}
+
+	private void unsetIndexOnColumn(Integer columnNumber){
+		indexData[columnNumber] = 0;
+	}
+
+	/*
+	 * Check if index already exists on the given column number.
+	 */
+	private boolean indexExistsOnColumn(Integer columnNumber) {
+		return (this.indexData[columnNumber-1] == 1);
+	}
 
 }
