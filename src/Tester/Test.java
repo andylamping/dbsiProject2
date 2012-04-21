@@ -54,11 +54,15 @@ public class Test {
 
 
 				/**
-				 * If format is correct, we need to check if heapfile already exists.
+				 * If format is correct, we need to check if heapfile 
+				 * already exists.
 				 */
 				CSVFile csvSource = new CSVFile(args[argIndex]);
 				BufferedReader br;
 				try {
+					/*
+					 * Get necessary information from the CSV File.
+					 */
 					br = new BufferedReader(new FileReader(args[argIndex]));
 					csvSource.schema = csvSource.getSchemaFromFile(br);
 					csvSource.getSchemaArrayFromSchema();
@@ -88,7 +92,11 @@ public class Test {
 					if (!(hfTarget.schema.equalsIgnoreCase(csvSource.schema)))
 						System.out.println("Error: Schema of the CSV and Heap files do not match");
 					else{
-//						hfTarget.writeHeaderInformationToFile();
+						/*
+						 * If schema matches, we make append the records to the 
+						 * heapfile and increment the number of records in the
+						 * Heapfile header.
+						 */
 						hfTarget.writeCsvContentsToHeapFile(csvSource);
 					}
 
@@ -96,7 +104,11 @@ public class Test {
 
 			}
 			else if (!args[1].equals("-i")){
-				// we want to either query the heapfile or build an index
+				/*
+				 *  we want to either 
+				 *  QUERY THE HEAPFILE or 
+				 *  BUILD AN INDEX ( or MULTIPLE INDEXES)
+				 */
 
 				if(args[1].contains("-b")){
 					// build index
@@ -107,6 +119,7 @@ public class Test {
 					HeapFile heapFile = new HeapFile(args[0], true, null, null);
 
 					Query query = new Query(heapFile, args);
+					query.processQuery();
 					return;
 				}
 

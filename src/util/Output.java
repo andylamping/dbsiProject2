@@ -9,6 +9,8 @@ public class Output {
 	private int[] offsetList;
 	public Output(Query inputQuery){
 		this.query = inputQuery;
+		removeDuplicates();
+		outputFile();
 	}
 	
 	// removes duplicate records from the list of matching records
@@ -50,14 +52,22 @@ public class Output {
 
 	if(this.query.projectionList.isEmpty()){
 		//						this.query.heapFile output = new this.query.heapFile("output", false, this.query.heapFile.schema, this.query.heapFile.schemaArray, null);
-		String outputString = this.query.heapFile.getCertainRecordsFromHeapFile(this.query.matchingRecords);
-		System.out.println(outputString);
-		ArrayList<String> s = new ArrayList<String>();
-		s.add(this.query.heapFile.schema+"\n");
-		s.add(outputString);
-		CSVFile output = new CSVFile("example_output.acsv", s);
-		output.getSchemaFromContents();
-		output.writeRecordToCSVFileUsingBufferedWriter(query.heapFile);
+//		String outputString = this.query.heapFile.getCertainRecordsFromHeapFile(this.query.matchingRecords);
+//		System.out.println(outputString);
+//		ArrayList<String> s = new ArrayList<String>();
+//		s.add(this.query.heapFile.schema+"\n");
+//		s.add(outputString);
+//		CSVFile output = new CSVFile("example_output.acsv", s);
+//		output.getSchemaFromContents();
+//		output.writeContentsToFile
+//		output.writeRecordToCSVFileUsingBufferedWriter(query.heapFile);
+		
+		CSVFile output = new CSVFile("example_output.acsv");
+		output.writeDataToFile(this.query.heapFile.schema+"\n");
+		for (Integer i:this.query.matchingRecords){
+			output.writeDataToFile(this.query.heapFile.getRecordByRIDFromHeapFile(i));
+		}
+		
 	}
 	else{
 		String[] transfer = new String[this.query.projectionList.size()];

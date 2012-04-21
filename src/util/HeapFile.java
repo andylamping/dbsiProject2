@@ -244,28 +244,14 @@ public class HeapFile extends MyFile{
 	public long writeRecordAsByteToHeapFile(String record){
 		Comparer comparer = new Comparer();
 		String s[] = record.split(",");
-//		RandomAccessFile raf;
 		long startOffsetForRecord = this.currentFileOffset;
-//		try {
-//			raf = new RandomAccessFile(new File(path), "rw");
-			for (int j = 0; j<s.length ; j++){
-				comparer.compare_functions[schemaArray[j]].write(path, currentFileOffset, s[j], lengthArray[j]);
-//				comparer.compare_functions[schemaArray[j]].writeAtOffset(raf, currentFileOffset, s[j], lengthArray[j]);
-				this.currentFileOffset += lengthArray[j];
-			}
-//			raf.close();
-			if (Config.DEBUG) System.out.println("Record written to the file");
+		for (int j = 0; j<s.length ; j++){
+			comparer.compare_functions[schemaArray[j]].write(path, currentFileOffset, s[j], lengthArray[j]);
+			this.currentFileOffset += lengthArray[j];
+		}
+		if (Config.DEBUG) System.out.println("Record written to the file");
 
-			return startOffsetForRecord;
-//		} catch (FileNotFoundException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		
-//		return (long) -1;
+		return startOffsetForRecord;
 	}
 
 
@@ -328,6 +314,23 @@ public class HeapFile extends MyFile{
 		//		System.out.println("+1 Record read from the heap");
 
 		return result.substring(0, result.length()-1);
+	}
+	
+	public String getRecordByRIDFromHeapFile(Integer RID){
+		String result = "";
+		
+		byte[] val;
+		Comparer comparer = new Comparer();
+		
+		long position = this.currentFileOffset + this.numberOfBytesPerRecord * RID;
+		for(int i = 0; i<this.schemaArray.length; i++){
+			val = comparer.compare_functions[schemaArray[i]].read(this.path,(int) position, this.lengthArray[i]);
+			result += comparer.compare_functions[schemaArray[i]].readString(this.path,(int) position, this.lengthArray[i]) + ",";
+			position += val.length;
+		}
+		
+		result = result.substring(0, result.length()-1)+"\n";
+		return result;
 	}
 
 	public String getCertainRecordsFromHeapFile(ArrayList<Integer> matchingRecords){

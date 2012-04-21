@@ -23,15 +23,18 @@ public class Query {
 	
 	public Query(HeapFile inputHeap, String[] arguments) {
 		this.heapFile = inputHeap;
-		this.args = arguments;
-		this.dummyRecord  = new ArrayList<ArrayList<Condition>>();
+		this.args = arguments;		
+	}
+
+	public void processQuery (){
+		this.dummyRecord = new ArrayList<ArrayList<Condition>>();
 		this.addConditions();
 		this.addProjections();
 		this.argIndex = 1;
 		this.projectionList = new ArrayList<String>();
-		
+		this.findMatchingRecords();
+		Output output = new Output(this);
 	}
-
 	private void addConditions(){
 
 		int argCount = 0;
@@ -74,6 +77,7 @@ public class Query {
 
 				}
 			}
+			argIndex++;
 		
 	}
 		

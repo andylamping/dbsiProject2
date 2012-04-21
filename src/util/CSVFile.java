@@ -22,7 +22,7 @@ public class CSVFile extends MyFile{
 	public CSVFile (String path){
 		this.path = path;
 	}
-		
+
 	public void writeRecordToCSVFileUsingBufferedWriter(HeapFile hfile){		
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(path)));
@@ -30,11 +30,11 @@ public class CSVFile extends MyFile{
 			// Write the schema to the file
 			bw.write(hfile.schema+"\n");
 			if (Config.DEBUG) System.out.println(hfile.schema);
-			
+
 			//	Fetch first record from the heap file.
 			String currentRecord = hfile.getRecordFromHeapFile();
 			count++;
-			
+
 			for (int i=0 ;i<hfile.numberOfRecords;i++){
 				bw.write(currentRecord+"\n");
 				//	Fetch subsequent records from the heap file.
@@ -57,13 +57,27 @@ public class CSVFile extends MyFile{
 		}
 		return null;
 	}
-	
+
 	public String getSchemaFromFile(BufferedReader br){
 		return getRecordFromFile(br);
 	}
-	
+
 	public void getSchemaFromContents(){
 		this.schema = this.contents.remove(0);
+	}
+	public void writeDataToFile(String string) {
+		BufferedWriter bw;
+		try {
+			bw = new BufferedWriter(new FileWriter(path, true));
+//			bw.newLine();
+			bw.write(string);
+			bw.close();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 
