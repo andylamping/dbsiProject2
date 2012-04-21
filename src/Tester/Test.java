@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import util.CSVFile;
 import util.HeapFile;
@@ -36,34 +37,26 @@ public class Test {
 		 */
 		if (args.length > 1){
 
+			
 			//checking if -i token is the second argument
 			if (args[1].equals("-i")){
-				// now we are inserting new records into the heapfile
-				// we have two situations: building an index in addtion to adding records or just adding new records
-				int argIndex = 3;
-				int indexToBuild = Integer.MAX_VALUE;
-				// check for < token
-				if(!args[2].equals("<")){
-					// we are building/rebuilding an index
-					// advance index in args as we now have an additional argument -b#
-					argIndex++;
-					// parse the # in the -b#
-					indexToBuild = Integer.parseInt(args[2].substring(2));
-
-				}
-
-
+				// if so, we want to insert record
+				// we also may want to build an index
+				// but first, we add the new records
+				
 				/**
-				 * If format is correct, we need to check if heapfile 
-				 * already exists.
+				 * we need to check if the given heapfile 
+				 * already exists. and if it does, we need to check the the schemas of the
+				 * input CSV and the heapFile match. if the heapfile doesnt exist, then we make
+				 * the schema of the new heapfile the schema of the csv then add records from
+				 * the csv to the heap
 				 */
-				CSVFile csvSource = new CSVFile(args[argIndex]);
+				// first get the name of the csvSource
+				CSVFile csvSource = new CSVFile(args[args.length-1]);
 				BufferedReader br;
 				try {
-					/*
-					 * Get necessary information from the CSV File.
-					 */
-					br = new BufferedReader(new FileReader(args[argIndex]));
+					br = new BufferedReader(new FileReader(args[args.length-1]));
+					// get schema of SCV
 					csvSource.schema = csvSource.getSchemaFromFile(br);
 					csvSource.getSchemaArrayFromSchema();
 					br.close();
@@ -83,7 +76,8 @@ public class Test {
 					HeapFile hfTarget = new HeapFile(args[0], false, csvSource.schema, csvSource.schemaArray);
 					hfTarget.writeHeaderInformationToFile();
 					hfTarget.writeCsvContentsToHeapFile(csvSource);
-				}else{
+				}
+				else{
 					/*
 					 * If file exists, we compare the schema of HeapFile 
 					 * with the Schema of the CSVFile input.
@@ -99,8 +93,30 @@ public class Test {
 						 */
 						hfTarget.writeCsvContentsToHeapFile(csvSource);
 					}
-
 				}
+
+				//  the records have now been added to the heapFile
+
+				// now, we build index(es) if there is any
+				// so, we scan the command line to see and if there are any, we add to arrayList buildIndexes
+				ArrayList<Integer> buildIndexes = new ArrayList<Integer>();
+				int x = 1;
+				while(x < args.length - 2){
+					if(args[x].contains("-b")){
+						int indexToBuild = Integer.parseInt(args[x].substring(args.length-1));
+						buildIndexes.add(indexToBuild);
+					}
+					x++;
+				}
+				
+				// now, we call the heapFile buildIndex function to build the indexes, if any
+				x = 0;
+				while(x < buildIndexes.size()){
+					hfTarget.buildIndexOnColumn(buildIndexes.get(x));
+					x++;
+				}
+				// and we are done!
+				return;
 
 			}
 			else if (!args[1].equals("-i")){
@@ -109,19 +125,42 @@ public class Test {
 				 *  QUERY THE HEAPFILE or 
 				 *  BUILD AN INDEX ( or MULTIPLE INDEXES)
 				 */
+				
+				// first prepare the heapfile so we can build indexes and/or query
+				HeapFile hfTarget = new HeapFile(args[0], true, null, null);
 
-				if(args[1].contains("-b")){
-					// build index
-					return;
+				// first we check if there are any indexes to build
+				// and if there are, we want to build them before we query
+				ArrayList<Integer> buildIndexes = new ArrayList<Integer>();
+				int x = 1;
+				while(x < args.length - 2){
+					if(args[x].contains("-b")){
+						int indexToBuild = Integer.parseInt(args[x].substring(args.length-1));
+						buildIndexes.add(indexToBuild);
+					}
+					x++;
 				}
-				else{
-					//Query the heap file
-					HeapFile heapFile = new HeapFile(args[0], true, null, null);
-
-					Query query = new Query(heapFile, args);
-					query.processQuery();
-					return;
+				
+				// now, we call the heapFile buildIndex function to build the indexes, if any
+				x = 0;
+				while(x < buildIndexes.size()){
+					hfTarget.buildIndexOnColumn(buildIndexes.get(x));
+					x++;
 				}
+				// the indexes have been built
+				// no we can query if we need to
+			
+				
+			
+				//prepare the the heap file
+				HeapFile heapFile = new HeapFile(args[0], true, null, null);
+				// construct new query
+				Query query = new Query(heapFile, args);
+				// process query. query first checks to see if the command line has a condition or projection
+				// and if it does, the query is processed. if not, the program is finished.
+				query.processQuery();
+				return;
+				
 
 			} // end of query brackets
 

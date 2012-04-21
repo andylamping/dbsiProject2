@@ -27,33 +27,14 @@ public class Query {
 	}
 
 	public void processQuery (){
-		// check if there is a query in the command line
-		int hasQuery = this.hasQuery();
-		// if not, program terminates
-		if(hasQuery == 0){
-			return;
-		}
-		this.argIndex = 1;
 		this.dummyRecord = new ArrayList<ArrayList<Condition>>();
-		this.projectionList = new ArrayList<String>();
 		this.addConditions();
 		this.addProjections();
+		this.argIndex = 1;
+		this.projectionList = new ArrayList<String>();
 		this.findMatchingRecords();
 		Output output = new Output(this);
 	}
-	private int hasQuery() {
-		// scan the arguments to see if there is a condition or projection
-		// if there is one
-		int x = 1;
-		while(x < this.args.length){
-			if(args[x].contains("-s") || args[x].contains("-p")){
-				return 1;
-			}
-			x++;
-		}
-		return 0;
-	}
-
 	private void addConditions(){
 
 		int argCount = 0;
