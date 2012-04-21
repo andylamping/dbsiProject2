@@ -1,5 +1,7 @@
 package Tester;
 
+import java.io.File;
+
 import util.Bucket;
 import util.IndexFile;
 
@@ -31,10 +33,14 @@ public class Flusher {
 		indexFileTest.writeHeaderInformationToFile();
 		indexFileTest.writeInitialBucketsToFile();
 		long ptr = 0;
-		for (int i = 0; i<20; i++){
-			indexFileTest.writeToIndexFile(0, ptr);
+		for (int i = 0; i<1000; i++){
+			indexFileTest.writeToIndexFile(i, ptr);
 			ptr +=10;
 		}
+		File f1 = new File("indexFILE");
+		f1.delete();
+		File f2 = new File("overflowFile");
+		f2.delete();
 	}
 
 
