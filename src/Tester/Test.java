@@ -43,6 +43,7 @@ public class Test {
 				// if so, we want to insert record
 				// we also may want to build an index
 				// but first, we add the new records
+				HeapFile hfTarget;
 				
 				/**
 				 * we need to check if the given heapfile 
@@ -73,7 +74,7 @@ public class Test {
 					 * If file doesn't exist, we create a new file with
 					 * the schema from the CSV File.
 					 */
-					HeapFile hfTarget = new HeapFile(args[0], false, csvSource.schema, csvSource.schemaArray);
+					 hfTarget = new HeapFile(args[0], false, csvSource.schema, csvSource.schemaArray);
 					hfTarget.writeHeaderInformationToFile();
 					hfTarget.writeCsvContentsToHeapFile(csvSource);
 				}
@@ -82,7 +83,7 @@ public class Test {
 					 * If file exists, we compare the schema of HeapFile 
 					 * with the Schema of the CSVFile input.
 					 */
-					HeapFile hfTarget = new HeapFile(args[0], true, null, null);
+					 hfTarget = new HeapFile(args[0], true, null, null);
 					if (!(hfTarget.schema.equalsIgnoreCase(csvSource.schema)))
 						System.out.println("Error: Schema of the CSV and Heap files do not match");
 					else{
@@ -133,7 +134,7 @@ public class Test {
 				// and if there are, we want to build them before we query
 				ArrayList<Integer> buildIndexes = new ArrayList<Integer>();
 				int x = 1;
-				while(x < args.length){
+				while(x < args.length - 2){
 					if(args[x].contains("-b")){
 						int indexToBuild = Integer.parseInt(args[x].substring(args.length-1));
 						buildIndexes.add(indexToBuild);
