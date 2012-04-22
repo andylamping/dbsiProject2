@@ -138,7 +138,7 @@ public class Test {
 					
 					if(args[x].contains("-b")){
 						System.out.println("index to build found in command line");
-						int indexToBuild = Integer.parseInt(args[x].substring(args.length));
+						int indexToBuild = Integer.parseInt(args[x].substring(args[x].length() -1));
 						System.out.println("that index is " + indexToBuild);
 						buildIndexes.add(indexToBuild);
 					}
