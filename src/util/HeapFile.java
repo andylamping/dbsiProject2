@@ -244,7 +244,9 @@ public class HeapFile extends MyFile{
 						String dataType = this.schema.split(",")[i];
 						IndexFile iFile = new IndexFile(path+ "." +column+".lht", path+"."+column+".lho", dataType);
 						Object data;
+						
 						data = getAppropriateData(currentRecord, column,dataType);
+					
 						if (data == null){
 							if (Config.DEBUG) System.out.println("Data reading problem");
 						}
@@ -353,17 +355,17 @@ public class HeapFile extends MyFile{
 
 	public String getRecordByRIDFromHeapFile(Integer RID){
 		String result = "";
-
+		
 		byte[] val;
 		Comparer comparer = new Comparer();
-
-		long position = this.currentFileOffset + this.numberOfBytesPerRecord * RID;
+		
+		long position = this.offsetEndOfHeader + (RID ) * this.numberOfBytesPerRecord;
 		for(int i = 0; i<this.schemaArray.length; i++){
 			val = comparer.compare_functions[schemaArray[i]].read(this.path,(int) position, this.lengthArray[i]);
 			result += comparer.compare_functions[schemaArray[i]].readString(this.path,(int) position, this.lengthArray[i]) + ",";
 			position += val.length;
 		}
-
+		System.out.println(result);
 		result = result.substring(0, result.length()-1)+"\n";
 		return result;
 	}
@@ -373,8 +375,10 @@ public class HeapFile extends MyFile{
 
 		byte[] val;
 		Comparer comparer = new Comparer();
-
-		long position = this.currentFileOffset + this.numberOfBytesPerRecord * RID;
+		this.getHeaderInformationFromFile();
+		System.out.println(this.currentFileOffset + "OF");
+		long position = RID;
+		System.out.println(RID + "RID");
 		for(int i = 0; i<this.schemaArray.length; i++){
 			val = comparer.compare_functions[schemaArray[i]].read(this.path,(int) position, this.lengthArray[i]);
 			result += comparer.compare_functions[schemaArray[i]].readString(this.path,(int) position, this.lengthArray[i]) + ",";
@@ -382,6 +386,7 @@ public class HeapFile extends MyFile{
 		}
 
 		result = result.substring(0, result.length()-1)+"\n";
+		System.out.println(result + "record!");
 		return result;
 	}
 
@@ -542,9 +547,13 @@ public class HeapFile extends MyFile{
 			// Create a new index.
 			
 			// Delete the old index if already present
+
 			File indexF  = new File (path+ "." +columnNumber+".lht");
+
 			if (indexF.exists()) indexF.delete();
+
 			File overflowF = new File(path+"."+columnNumber+".lho");
+
 			if (overflowF.exists()) overflowF.delete();
 
 			IndexFile iFile = new IndexFile(path+ "." +columnNumber+".lht", path+"."+columnNumber+".lho", dataType);
@@ -558,6 +567,7 @@ public class HeapFile extends MyFile{
 				currentRecord = this.getRecordFromHeapFile();
 				System.out.println("Current record is" + currentRecord);
 				data = getAppropriateData(currentRecord, columnNumber,dataType);
+		
 				if (data == null){
 					if (Config.DEBUG) System.out.println("Data reading problem");
 				}
@@ -656,11 +666,17 @@ public class HeapFile extends MyFile{
 	/*
 	 * Returns a list of RIDs that match up to the record
 	 */
+	/*
+	 * Returns a list of RIDs that match up to the record
+	 */
 	public ArrayList<Long> getListOfRidsForSelectionCondition(Integer columnNumber,Object value){
-		String dataType = this.schema.split(",")[columnNumber-1];
-		IndexFile iFile = new IndexFile(path+ "." +columnNumber+".lht", path+"."+columnNumber+".lho", dataType);
 		
-		return ((IndexFile) iFile).getListOfRIDsForColumnValue(value);
+		String dataType = this.schema.split(",")[columnNumber-1];
+		//System.out.println(dataType);
+		IndexFile iFile = new IndexFile(path+ "." +columnNumber+".lht", path+"."+columnNumber+".lho", dataType);
+		//System.out.println(columnNumber);
+		iFile.getHeaderInformationFromFile();
+		System.out.println("NP " + iFile.nextPointer);
+		return iFile.getListOfRIDsForColumnValue(value);
 	}
-
 }

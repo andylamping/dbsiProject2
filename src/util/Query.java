@@ -47,16 +47,15 @@ public class Query {
 		if (projectionList.size() != 0)
 			this.projections = this.computeProjectionArray();
 		this.findMatchingRecords();
-		//if(this.matchingRecords != null){
-		//	System.out.println("has matching records!!");
-		//	Output output = new Output(this);
-		//}
-		if(this.hashRecords != null){
-			System.out.println("matching hash records!");
+		if(this.matchingRecords != null){
 			Output output = new Output(this);
 		}
-		this.findMatchingRecords2();
-		// Output output = new Output(this);
+		else if(this.hashRecords != null){
+			Output output = new Output(this);
+		}
+		else{
+
+		}
 	}
 	private int hasQuery() {
 		// scan the arguments to see if there is a condition or projection
@@ -137,7 +136,7 @@ public class Query {
 		this.argIndex = 1;
 		// if argument contains a p, as in -p1, add this arg to projections and advance to next index
 		while(this.argIndex <= (this.args.length - 1)){
-			if(this.args[this.argIndex].contains("p")){
+			if(this.args[this.argIndex].contains("-p")){
 				int columnNumber = Integer.parseInt(this.args[this.argIndex].substring(2));
 				if(columnNumber > heapFile.numberOfFields || columnNumber == 0){
 					System.out.println("Sorry. That column for projection does not exist.");
@@ -416,6 +415,7 @@ public class Query {
 			int e = 0;
 			int matchesNeeded = m - 1;
 			if(m == 1){
+				System.out.println(this.matchingRecords.size());
 				return;
 			}
 			while(e < this.matchingRecords.size()){
@@ -480,7 +480,11 @@ public class Query {
 			// INSERT THE SELECTION CODE HERE FROM FINDMATCHINGRECORDS()
 		}
 	}
-	
+
+	/*
+	 * Writes the Record numbers in this.matchingRecords ,
+	 * after Projections to the file, example_output.acsv.
+	 */
 	public void writeSelectedDataAfterProjections (){
 		String schema = "", currentRecord = "";
 		long RID;
@@ -499,7 +503,7 @@ public class Query {
 			csvTarget.writeDataToFile(currentRecord);
 		}
 	}
-
+	
 	public String projectData (String data){
 		if (projectionList.size() != 0){
 			String []dataElements = data.split(",");
@@ -513,4 +517,3 @@ public class Query {
 	}
 
 }
-

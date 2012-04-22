@@ -12,20 +12,34 @@ private int[] offsetList;
 
 public Output(Query inputQuery){
 this.query = inputQuery;
+this.offsetList = this.query.heapFile.getOffsetList();
 processOutput();
 }
 
 private void processOutput() {
-//if(this.query.matchingRecords != null){
+if(this.query.matchingRecords != null){
+	outputFile();
+	System.out.println("Recs!");
+}
+else if(this.query.hashRecords != null){
 	outputFileHash();
-//}
-//else if(this.query.hashRecords != null){
-//	outputFile();
-//}
-
+	System.out.println("Hash!");
+}
+	else{
+		emptyOutput();
+		System.out.println("Empty file printed.");
+	}
 
 }
 
+private void emptyOutput() {
+	File f1 = new File("example_output.acsv");
+	f1.delete();
+CSVFile output = new CSVFile("example_output.acsv");
+output.writeDataToFile(this.query.heapFile.schema+"\n");
+	
+}
+/**
 // removes duplicate records from the list of matching records
 public void removeDuplicates(){
 int m = 0;
@@ -56,9 +70,12 @@ e++;
 if(this.query.dummyRecord.size() > 1){
 this.query.matchingRecords = conditionedRecords;
 }
-
+File f1 = new File("example_output.acsv");
+f1.delete();
+CSVFile output = new CSVFile("example_output.acsv");
+output.writeDataToFile(this.query.heapFile.schema+"\n");
 }
-
+**/
 
 // prepare output file
 public void outputFileHash(){
@@ -143,18 +160,14 @@ if(this.query.projectionList.isEmpty()){
 // output.getSchemaFromContents();
 // output.writeContentsToFile
 // output.writeRecordToCSVFileUsingBufferedWriter(query.heapFile);
-File f1 = new File("example_output1.acsv");
+File f1 = new File("example_output.acsv");
 f1.delete();
-CSVFile output = new CSVFile("example_output1.acsv");
+CSVFile output = new CSVFile("example_output.acsv");
 
-if(this.query.matchingRecords == null){
-	output.writeDataToFile("");
-	return;
-}
 output.writeDataToFile(this.query.heapFile.schema+"\n");
+System.out.println(this.query.matchingRecords.size());
 for (Integer i:this.query.matchingRecords){
-	long a = 67;
-output.writeDataToFile(this.query.heapFile.getRecordByRIDFromHeapFile(a));
+output.writeDataToFile(this.query.heapFile.getRecordByRIDFromHeapFile(i));
 }
 
 }
