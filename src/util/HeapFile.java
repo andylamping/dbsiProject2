@@ -66,7 +66,13 @@ public class HeapFile extends MyFile{
 			this.getNumberOfBytesPerRecord();
 			this.getSchemaArrayFromSchema();
 			this.indexData = new int [this.schemaArray.length];
+			int i = 0;
+			while (i < indexData.length){
+				this.indexData[i] = 0;
+				i++;
+			}
 			this.writeHeaderInformationToFile();
+			System.out.println("heap file " + this.path +  " created");
 
 		}
 	}
@@ -159,6 +165,7 @@ public class HeapFile extends MyFile{
 
 				raf.read(b, 0, 4);
 				this.indexData[i] = Helper.toInt(b);
+				System.out.println("Index " + i + "in indexData is " + Helper.toInt(b));
 			}
 			// Offset after Header information has been read.
 			this.offsetEndOfHeader = this.currentFileOffset = raf.getFilePointer();
@@ -181,8 +188,9 @@ public class HeapFile extends MyFile{
 		// and the updated Index
 
 		int []tempIndexData = new int[this.numberOfBytesInIndexData];
-		for (int i = 0; i< this.numberOfBytesInIndexData ; i++){
-			if (this.indexData [i] == 1 || newIndexData[i] == 1)
+		for (int i = 0; i< this.indexData.length ; i++){
+			if (this.indexData[i] == 1 || newIndexData[i] == 1)
+				
 				tempIndexData[i] = 1;
 		}
 
@@ -193,6 +201,7 @@ public class HeapFile extends MyFile{
 		try {
 			raf = new RandomAccessFile(new File(this.path), "rw");
 			raf.seek(this.offsetIndexData);
+			System.out.println("rewrote indexdata in heap");
 			raf.write(Helper.toByta(indexData));
 			raf.close();
 		} catch (FileNotFoundException e) {
@@ -497,6 +506,7 @@ public class HeapFile extends MyFile{
 		String dataType = this.schema.split(",")[columnNumber-1];
 
 		if (indexExistsOnColumn(columnNumber)){
+			System.out.println("already exists!");
 			// If Index already exists on the given column number.
 
 		}else{
@@ -514,10 +524,12 @@ public class HeapFile extends MyFile{
 			long currentRecordPointer = this.currentFileOffset;
 			for (int i= 0 ;i < this.numberOfRecords; i++){
 				currentRecord = this.getRecordFromHeapFile();
+				System.out.println("Current record is" + currentRecord);
 				data = getAppropriateData(currentRecord, columnNumber,dataType);
 				if (data == null){
 					if (Config.DEBUG) System.out.println("Data reading problem");
 				}
+				System.out.println("Inserting" + data);
 				iFile.writeToIndexFile(data, currentRecordPointer);
 				currentRecordPointer += numberOfBytesPerRecord;
 			}
@@ -535,7 +547,7 @@ public class HeapFile extends MyFile{
 
 		Object retValue = null;
 		String dataToBeReturned = currentRecord.split(",")[columnNumber -1];
-
+		System.out.println("datatobereturned is " + dataToBeReturned);
 		switch (type) {
 		case 'c':
 			// If data is a string, we return it as it is.
@@ -587,7 +599,8 @@ public class HeapFile extends MyFile{
 
 
 	private void setIndexOnColumn(Integer columnNumber) {
-		indexData[columnNumber] = 1;
+		this.indexData[columnNumber - 1] = 1;
+		System.out.println("index on column number " + columnNumber + " set to 1");
 	}
 
 
@@ -596,6 +609,12 @@ public class HeapFile extends MyFile{
 	 * Check if index already exists on the given column number.
 	 */
 	public boolean indexExistsOnColumn(Integer columnNumber) {
+		System.out.println("Checking to see if index exists.");
+		if(this.indexData[columnNumber-1] == 1){
+			System.out.println("It does");
+		}
+		else
+			System.out.println("It doesnt");
 		return (this.indexData[columnNumber-1] == 1);
 	}
 	

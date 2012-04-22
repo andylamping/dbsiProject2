@@ -57,6 +57,7 @@ public class IndexFile {
 		 * Column Length -	depends on the value - 	length 4 bytes (since we store Integer value)
 		 * next Pointer  -	depends on the value - 	length 4 bytes (since we store Integer value)
 		 */
+		System.out.println("Writing headerinformation to index file");
 		File f = new File(this.path);
 		try {
 			RandomAccessFile raf = new RandomAccessFile(f, "rw");
@@ -246,6 +247,7 @@ public class IndexFile {
 
 		Bucket initial ;
 		long offsetForNewBucket = this.currentFileOffset;
+		System.out.println(this.dataType);
 		for (int i = 0; i< this.numberOfBuckets; i++){
 			initial = new Bucket(numberOfEntriesInBucket, (long)-1);
 			initial.writeData();

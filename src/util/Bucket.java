@@ -50,8 +50,12 @@ public class Bucket {
 			offset = raf.getFilePointer();
 
 			for (int i = 0; i< this.maxSize ; i ++){
+				if(datatype.contains("c")){
+					comparer.compare_functions[6].writeAtOffset(raf, offset, this.data[i][0]+"", Integer.parseInt(datatype.substring(1)));
+				}
 				// Use appropriate write method based on the datatype that the index file holds.
-				comparer.compare_functions[comparer.mapper.indexOf(datatype)].writeAtOffset(raf, offset, this.data[i][0]+"", Integer.parseInt(datatype.substring(1)));
+				else
+					comparer.compare_functions[comparer.mapper.indexOf(datatype)].writeAtOffset(raf, offset, this.data[i][0]+"", Integer.parseInt(datatype.substring(1)));
 				offset += Integer.parseInt(datatype.substring(1));
 				// Write the pointer , right after the 
 				comparer.compare_functions[3].writeAtOffset(raf,offset,this.data[i][1]+"",8);

@@ -126,7 +126,7 @@ public class Test {
 				 *  QUERY THE HEAPFILE or 
 				 *  BUILD AN INDEX ( or MULTIPLE INDEXES)
 				 */
-				
+			
 				// first prepare the heapfile so we can build indexes and/or query
 				HeapFile hfTarget = new HeapFile(args[0], true, null, null);
 
@@ -134,9 +134,12 @@ public class Test {
 				// and if there are, we want to build them before we query
 				ArrayList<Integer> buildIndexes = new ArrayList<Integer>();
 				int x = 1;
-				while(x < args.length - 2){
+				while(x < args.length){
+					
 					if(args[x].contains("-b")){
-						int indexToBuild = Integer.parseInt(args[x].substring(args.length-1));
+						System.out.println("index to build found in command line");
+						int indexToBuild = Integer.parseInt(args[x].substring(args.length));
+						System.out.println("that index is " + indexToBuild);
 						buildIndexes.add(indexToBuild);
 					}
 					x++;
