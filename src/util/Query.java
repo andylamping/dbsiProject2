@@ -34,10 +34,11 @@ public class Query {
 		if(hasQuery == 0){
 			return;
 		}
-		this.argIndex = 1;
 		this.dummyRecord = new ArrayList<ArrayList<Condition>>();
 		this.projectionList = new ArrayList<String>();
+		this.argIndex = 1;
 		this.addConditions();
+		this.argIndex = 1;
 		this.addProjections();
 		this.findMatchingRecords();
 		Output output = new Output(this);
@@ -113,9 +114,9 @@ public class Query {
 	
 	
 	private void addProjections() {
-
+		
 		// if argument contains a p, as in -p1, add this arg to projections and advance to next index
-		if(this.argIndex <= (this.args.length - 1) && this.args[this.argIndex].contains("p")){
+		while(this.argIndex <= (this.args.length - 1) && this.args[this.argIndex].contains("p")){
 			int columnNumber = Integer.parseInt(this.args[this.argIndex].substring(2));
 			if(columnNumber > heapFile.numberOfFields  || columnNumber == 0){
 				System.out.println("Sorry. That column for projection does not exist.");
