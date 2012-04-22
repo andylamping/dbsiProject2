@@ -45,8 +45,8 @@ public class Query {
 		this.addProjections();
 		if (projectionList.size() != 0) 
 			this.projections = this.computeProjectionArray();
-		this.findMatchingRecords2();
-		//		Output output = new Output(this);
+		this.findMatchingRecords();
+				Output output = new Output(this);
 	}
 	private int hasQuery() {
 		// scan the arguments to see if there is a condition or projection
@@ -165,11 +165,8 @@ public class Query {
 						// get RIDs
 						ArrayList<Long> equalityRIDs = this.heapFile.getListOfRidsForSelectionCondition(column, this.dummyRecord.get(x).get(y).value);
 						// add RIDs to list
-						int a = 0;
-						while(a < equalityRIDs.size()){
-							allRIDs.add(equalityRIDs.get(a));
-							a++;
-						}
+						allRIDs.addAll(equalityRIDs);
+
 						// remove this condition from this.dummyRecord
 						this.dummyRecord.get(x).remove(y);
 						// since we removed a condition, we dont want to skip the next condition
@@ -418,13 +415,239 @@ public class Query {
 				csvTarget.writeDataToFile(currentRecord);
 			}
 		}
-		
+
 		/* If selection conditions exist, we need to fetch the appropriate records */
 		else{
 			// INSERT THE SELECTION CODE HERE FROM FINDMATCHINGRECORDS()
+			ArrayList<Long> allRIDs = new ArrayList<Long>();   
+			int hashes = 0, x = 0, advance = 1, y = 0;
+
+			while (x < this.dummyRecord.size()){
+				y = 0;
+				// Get Column of condition list
+				int column = this.dummyRecord.get(x).get(y).column;
+				// Check if there is a hash index on this column
+				if (this.heapFile.indexExistsOnColumn(column)){
+
+					while (y < this.dummyRecord.get(x).size()){
+						// if current condition's parameter is equality, then we get the RIDs for the value	
+						String param = this.dummyRecord.get(x).get(y).parameter;
+						if (param.equals("=")){
+							// increase hashes 
+							hashes ++;
+							// get RIDs
+							ArrayList<Long> equalityRIDs = this.heapFile.getListOfRidsForSelectionCondition(column, this.dummyRecord.get(x).get(y).value);
+
+							// add RIDs to list
+							for (Long l : equalityRIDs){
+								allRIDs.add(l);
+							}
+
+							// remove this condition from this.dummyRecord
+							this.dummyRecord.get(x).remove(y);
+							// since we removed a condition, we dont want to skip the next condition
+							// the slid down as a result of the delete
+							advance = 0;
+						}
+						if(advance == 1){
+							y++;
+						}
+						advance = 1;
+
+					}
+					// advance to next condition if there is one.
+
+				}
+				x++;
+			}
+
+			// If 'hashes' > 1 then we can reduce the RID set by only keeping an RID
+			// if it appears in the list 'hashes' amount of time
+			if (hashes > 1){
+				ArrayList<Long> matchRIDs = new ArrayList<Long>();
+				int e = 0;
+				int matchesNeeded = hashes;
+
+				while (e < allRIDs.size()){
+					int f = e + 1;
+					int matched = 0;
+					int matches = 0;
+					while (matched == 0 && f < allRIDs.size()){
+						if (allRIDs.get(e).equals(allRIDs.get(f))){
+							matches++;
+						}
+						if (matches == matchesNeeded){
+							matchRIDs.add(allRIDs.get(e));
+							matched = 1;
+						}
+						f++;
+					}
+					e++;
+				}
+				if (matchRIDs.size()==0){
+					// no matches in the file so we return null
+					this.matchingRecords = null;
+					return;
+				}
+				// else switch allRIDs to the new set of matches
+				allRIDs = matchRIDs;
+			}
+
+			// If allRIDs.size()>0 , then we only want to compare the rest of the 
+			// conditions with
+			if (allRIDs.size()>0){
+				Comparer comparer = new Comparer();
+				this.hashRecords = new ArrayList<Long>();
+
+				try{
+					RandomAccessFile heap = new RandomAccessFile(new File(this.heapFile.path), "r");
+					Record dummyRec1 = new Record();
+					int [] offsetList = this.heapFile.getListOfLengths();
+					int [] lengthList = this.heapFile.getListOfLengths();
+
+					// go through each RID in allRIDs
+					for(Long z: allRIDs){
+						heap.seek(z);
+						byte [] heapRec = new byte[this.heapFile.numberOfBytesPerRecord];
+						heap.read(heapRec);
+
+						// compare with each condition list in this dummy record.
+
+						int reject = 0;
+						for (ArrayList<Condition> a: this.dummyRecord){
+							RandomAccessFile dum = new RandomAccessFile(new File("dummy"), "rw");
+							// write to dummyrec1
+							int[] compareList = new int[this.heapFile.schemaArray.length];
+							compareList = dummyRec1.writeDummyFile(a, compareList, this.heapFile);
+							// read the record
+							dum.seek(0);
+							byte[] dumRec = new byte[this.heapFile.numberOfBytesPerRecord];
+							dum.read(dumRec);
+
+
+							Record results = new Record();
+							int index = 0;
+							int match;
+							int condIndex1 = 0;
+							while(index < compareList.length && reject == 0){
+								int answer;
+								if(compareList[index] == 1){
+									answer = comparer.compare_functions[this.heapFile.schemaArray[index]].compare(dumRec, offsetList[index], heapRec, offsetList[index],lengthList[index]);
+									match = results.checkCompareResult(a.get(condIndex1).operator, answer);
+									if(match == 0){
+										reject = 1;
+									}
+									condIndex1++;
+								}
+
+								index++;
+							}
+							dum.close();
+							File dummy1 = new File("dummy");
+							dummy1.delete();
+						}
+						if (reject == 0){
+							// match found, add to matchRecords list
+							this.hashRecords.add(z);
+						}
+					}
+
+				}catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} // end of catchers
+
+				return;
+			}
+			// end of try
+			// if allRIDs.size() == 0 that must mean that we didnt have an index on any of the 
+			// of the columns that the query is conditioning
+			// so we traverse the heapfile as usual
+			if(allRIDs.size() == 0){
+				// below is how we find matching records for a column that doesnt have an index
+				Comparer comparer = new Comparer();
+				this.matchingRecords = new ArrayList<Integer>();
+				int m =  0;
+				int[] offsetList = this.heapFile.getOffsetList();
+
+				//int firstListCheck = 0;
+				while(m < this.dummyRecord.size()){
+
+					int[] compareList = new int[this.heapFile.schemaArray.length];
+					Record dummyRec = new Record();
+
+					compareList = dummyRec.writeDummyFile(this.dummyRecord.get(m), compareList, this.heapFile);
+
+
+					// create RAF to read heapFile
+
+					int[] lengthList = this.heapFile.getListOfLengths();
+					RandomAccessFile dummy;
+					try {
+						dummy = new RandomAccessFile(new File("dummy"), "rw");
+						RandomAccessFile raf1 = new RandomAccessFile(new File(this.heapFile.path), "r");
+
+						int currentRecord1 = 0;
+
+
+						while(currentRecord1 < this.heapFile.numberOfRecords){
+
+							raf1.seek(this.heapFile.currentFileOffset + (this.heapFile.numberOfBytesPerRecord * currentRecord1));
+							byte[] heapRec = new byte[this.heapFile.numberOfBytesPerRecord];
+							raf1.read(heapRec);
+
+							dummy.seek(0);
+							byte[] dumRec = new byte[this.heapFile.numberOfBytesPerRecord];
+							dummy.read(dumRec);
+
+							Record results = new Record();
+							int index = 0;
+							int reject = 0;
+							int match;
+							int condIndex1 = 0;
+							while(index < compareList.length && reject == 0){
+								int answer;
+								if(compareList[index] == 1){
+									answer = comparer.compare_functions[this.heapFile.schemaArray[index]].compare(dumRec, offsetList[index], heapRec, offsetList[index],lengthList[index]);
+									match = results.checkCompareResult(this.dummyRecord.get(m).get(condIndex1).operator, answer);
+									if(match == 0){
+										reject = 1;
+									}
+									condIndex1++;
+								}
+
+								index++;
+							}
+
+							if(reject == 0){
+								// match found, add to matchRecords list
+								this.matchingRecords.add(currentRecord1);
+							}
+
+							currentRecord1++;
+						} // end of scanning all records
+
+						dummy.close();
+						File dummy1 = new File("dummy");
+						dummy1.delete();
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} // end of catchers
+					m++;
+				} // end of m > 0 loop
+
+				return;
+			}
 		}
 	}
-	
+
 	public String projectData (String data){
 		if (projectionList.size() != 0){
 			String []dataElements = data.split(",");
