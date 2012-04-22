@@ -1,6 +1,7 @@
 package Tester;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import util.Bucket;
 import util.IndexFile;
@@ -42,9 +43,10 @@ public class Flusher {
 //		File f2 = new File("overflowFile");
 //		f2.delete();
 		
-		Object data = "Welcome";
+		ArrayList<ArrayList<String>> test = new ArrayList<ArrayList<String>>();
 		
-		System.out.println(data.getClass());
+		test.add(new ArrayList<String>());
+		System.out.println(test.get(0).size());
 	}
 
 

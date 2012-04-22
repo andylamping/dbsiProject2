@@ -7,6 +7,7 @@ import util.CSVFile;
 public class Output {
 	private Query query;
 	private int[] offsetList;
+	
 	public Output(Query inputQuery){
 		this.query = inputQuery;
 		processOutput();
