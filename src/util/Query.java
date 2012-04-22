@@ -47,12 +47,12 @@ this.addProjections();
 if (projectionList.size() != 0)
 	this.projections = this.computeProjectionArray();
 this.findMatchingRecords();
-if(this.matchingRecords != null){
-	System.out.println("has matching records!!");
-	Output output = new Output(this);
-}
-if(this.matchingRecords == null){
-	System.out.println("no matching records");
+//if(this.matchingRecords != null){
+//	System.out.println("has matching records!!");
+//	Output output = new Output(this);
+//}
+if(this.hashRecords != null){
+	System.out.println("matching hash records!");
 	Output output = new Output(this);
 }
 this.findMatchingRecords2();
@@ -177,13 +177,15 @@ if(this.heapFile.indexExistsOnColumn(column)){
 
 while(y < this.dummyRecord.get(x).size()){
 // if current condition's parameter is equality, then we get the RIDs for the value
-String param = this.dummyRecord.get(x).get(y).parameter;
+String param = this.dummyRecord.get(x).get(y).operator;
 if(param.equals("=")){
+	System.out.println("hash increase");
 // increase hashes
 	hashes++;
-// get RIDs
+// get RID
 	ArrayList<Long> equalityRIDs = this.heapFile.getListOfRidsForSelectionCondition(column, this.dummyRecord.get(x).get(y).value);
-// add RIDs to list
+	System.out.println(equalityRIDs.size() + "returned RIDs size!!");
+	// add RIDs to list
 	int a = 0;
 	while(a < equalityRIDs.size()){
 		allRIDs.add(equalityRIDs.get(a));
@@ -209,8 +211,10 @@ x++;
 
 // if 'hashes' > 1, then we can reduce the RID set by only keeping an RID
 // if it appears in the list 'hashes' amount of time
-if(hashes > 1){
-
+if(hashes > 0){
+	System.out.println("hashes > 0");
+	if(hashes > 1){
+		System.out.println("hashes > 1");
 ArrayList<Long> matchRIDs = new ArrayList<Long>();
 int e = 0;
 int matchesNeeded = hashes;
@@ -234,16 +238,13 @@ e++;
 }
 if(matchRIDs.size() == 0){
 // no matches in the file so we return null
-this.matchingRecords = null;
+this.hashRecords = null;
 return;
 }
 // else switch allRIDs to the new set of matches
 allRIDs = matchRIDs;
-
-if(allRIDs.size() == 0){
-	System.out.println("there was one or more hash index but no matches between them");
-	return;
-}
+	}
+// System.out.println(allRIDs.size() + "!!!");
 // if allRIDs.size() > 0, then we only want to compare the rest of the conditions with
 if(allRIDs.size() > 0){
 	Comparer comparer1 = new Comparer();
@@ -319,7 +320,7 @@ if(allRIDs.size() > 0){
 		// TODO Auto-generated catch block
 		e1.printStackTrace();
 	} // end of catchers
-
+	System.out.println(this.hashRecords.size() + " EHY");
 		return;
 	}
 }
