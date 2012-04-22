@@ -155,11 +155,11 @@ public class IndexFile {
 		}
 		else {
 
-			if (Config.DEBUG) System.out.println("Overflow has occured!");
+			if (Config.DEBUG) System.out.println("Overflow has occured!!!");
 			Bucket currentBucket = d;
 			Bucket overflowBucket= new Bucket(numberOfEntriesInBucket, (long)-1) ;
 			long currentBucketStartAddress = destinationOffset;
-			
+			System.out.println("here");
 			/*
 			 * Iterate to empty bucket.
 			 * Assumption - all Buckets are filled to the max.
@@ -167,6 +167,7 @@ public class IndexFile {
 			Iterate:
 			while ((overflowBucketStartAddress = currentBucket.getOverflowOffset()) != -1){
 				overflowBucket = overflowBucket.readBucketFromFile(overFlowPath, overflowBucketStartAddress, dataType);
+				System.out.println("here!!");
 				if (overflowBucket.writeInfoToBucket(data, ptr)){
 					if (Config.DEBUG) System.out.println("Data entered to overflow bucket");
 					writtenToBucket = true;
@@ -179,7 +180,7 @@ public class IndexFile {
 					break Iterate;
 				}
 				currentBucket = overflowBucket;
-			//	System.out.println("STUCK");
+				System.out.println("STUCK");
 				currentBucketStartAddress = overflowBucketStartAddress;
 			}
 			
