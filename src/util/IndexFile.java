@@ -14,11 +14,13 @@ public class IndexFile {
 
 	private String path;
 	private String overFlowPath;
-	private Integer nextPointer;
+	public Integer nextPointer;
 	private String dataType;
 	private Integer columnLength;
+//	private Integer headerLength = 12;
 	private Integer headerLength = 16;
 	private Integer numberOfBuckets = 4;
+	public long offsetNumberOfBuckets;
 	private Integer round = 1;
 	private Integer splitting = 0;
 	private Integer numberOfEntriesInBucket = Bucket.numberOfEntriesInBucket;
@@ -28,7 +30,6 @@ public class IndexFile {
 	public long offsetHeaderLength = 0;
 	public long offsetColumnLength ;
 	public long offsetNextPtr ;
-	public long offsetNumberOfBuckets;
 	public long offsetEndOfHeader;
 	public long currentFileOffset;
 
@@ -53,10 +54,9 @@ public class IndexFile {
 	public void writeHeaderInformationToFile (){
 		/*
 		 * Write header information to the Index File
-		 * Header Length -  always 16 bytes 	 - 	length 4 bytes (since we store Integer value)
+		 * Header Length -  always 12 bytes 	 - 	length 4 bytes (since we store Integer value)
 		 * Column Length -	depends on the value - 	length 4 bytes (since we store Integer value)
 		 * next Pointer  -	depends on the value - 	length 4 bytes (since we store Integer value)
-		 * NumofBuckets	 -	depends on the value -	length 4 bytes (since we store Integer value)
 		 */
 		System.out.println("Writing headerinformation to index file");
 		File f = new File(this.path);
@@ -68,10 +68,12 @@ public class IndexFile {
 			this.offsetColumnLength = this.currentFileOffset = raf.getFilePointer();
 			raf.write(Helper.toByta(this.columnLength));
 
+			System.out.println("writing pointer!!" + this.nextPointer);
 			this.offsetNextPtr = this.currentFileOffset = raf.getFilePointer();
 			raf.write(Helper.toByta(this.nextPointer));
 			
 			this.offsetNumberOfBuckets = this.currentFileOffset = raf.getFilePointer();
+
 			raf.write(Helper.toByta(this.numberOfBuckets));
 
 			this.offsetEndOfHeader = this.currentFileOffset = raf.getFilePointer();
@@ -87,53 +89,51 @@ public class IndexFile {
 	}
 
 	public void getHeaderInformationFromFile(){
-		File f = new File(this.path);
+        File f = new File(this.path);
 
-		RandomAccessFile raf;
-		try {
-			raf = new RandomAccessFile(f, "rw");
-			byte [] b = new byte [4];
+        RandomAccessFile raf;
+        try {
+                raf = new RandomAccessFile(f, "rw");
+                byte [] b = new byte [4];
 
-			//Read Header Length 
-			raf.seek(0);
-			raf.read(b, 0, 4);
-			this.headerLength = Helper.toInt(b);
+                //Read Header Length
+                raf.seek(0);
+                raf.read(b, 0, 4);
+                this.headerLength = Helper.toInt(b);
 
-			//Read Column Length 
-			this.offsetColumnLength = this.currentFileOffset = raf.getFilePointer();
-			raf.read(b,0,4);
-			this.columnLength = Helper.toInt(b);
+                //Read Column Length
+                this.offsetColumnLength = this.currentFileOffset = raf.getFilePointer();
+                raf.read(b,0,4);
+                this.columnLength = Helper.toInt(b);
 
-			//Read Next Pointer
-			this.offsetNextPtr = this.currentFileOffset = raf.getFilePointer();
-			raf.read(b,0,4);
-			this.columnLength = Helper.toInt(b);
+                //Read Next Pointer
+                this.offsetNextPtr = this.currentFileOffset = raf.getFilePointer();
+                raf.read(b,0,4);
+                this.columnLength = Helper.toInt(b);
+              //Read Number of Buckets
+                this.offsetNumberOfBuckets = this.currentFileOffset = raf.getFilePointer();
+                raf.read(b,0,4);
+                this.numberOfBuckets = Helper.toInt(b);
+                
+                this.offsetEndOfHeader = this.currentFileOffset = raf.getFilePointer();
 
-			//Read Number of Buckets
-			this.offsetNumberOfBuckets = this.currentFileOffset = raf.getFilePointer();
-			raf.read(b,0,4);
-			this.numberOfBuckets = Helper.toInt(b);
-			
-			this.offsetEndOfHeader = this.currentFileOffset = raf.getFilePointer();
+                raf.close();
 
-			raf.close();
+        } catch (FileNotFoundException e) {
+                System.out.println("IndexFile - Get Header Info from File - File not Found!");
+                e.printStackTrace();
+        } catch (IOException e) {
+                e.printStackTrace();
+        }
 
-		} catch (FileNotFoundException e) {
-			System.out.println("IndexFile - Get Header Info from File - File not Found!");
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
+}
 	/*
 	 * TODO 
 	 * Accept Data, get hashcode
 	 */
 	public void writeToIndexFile(Object data, long ptr){
 		Integer destinationBucketNumber = this.getHash( data);
-		System.out.println("Inserting " + data + " into bucket:" + destinationBucketNumber);
+		System.out.println("Inserting " + data + " into bucket:" + destinationBucketNumber + "at ptr " + ptr);
 		insertIntoDestinationBucket(destinationBucketNumber, data, ptr);
 	}
 
@@ -244,6 +244,7 @@ public class IndexFile {
 		return b; 
 		**/
 	//	System.out.println(data.getClass());
+
 		String str = "hey";
 		if(str.getClass() == data.getClass()){
 	//		System.out.println("STRING");
@@ -256,9 +257,9 @@ public class IndexFile {
 			return b;
 		}
 		
-		Integer b = Math.abs(data.hashCode()) % this.numberOfBuckets;
+		Integer b = Math.abs(data.toString().hashCode()) % this.numberOfBuckets;
 		if(b < this.nextPointer)
-			b = Math.abs(data.hashCode()) % (2 * this.numberOfBuckets);
+			b = Math.abs(data.toString().hashCode()) % (2 * this.numberOfBuckets);
 //		System.out.println(data + " !!! " + data.hashCode() + "  " + b);
 		return b;
 	}
@@ -284,8 +285,9 @@ public class IndexFile {
 	 */
 	public void split(){
 		this.splitting = 1;
+		
 		// increase number of buckets in index file
-		this.numberOfBuckets++;
+	
 		Bucket freshBucket = new Bucket(numberOfEntriesInBucket, (long) -1);
 		freshBucket.writeData();
 		freshBucket.writeBucketToFile(this.path, this.headerLength + (long) this.numberOfBuckets * sizeOfBucket(), this.dataType);
@@ -312,6 +314,7 @@ public class IndexFile {
 		 
 	
 		// get al
+		
 		int overFlowBucket1 = 0;
 	//	System.out.println("OVERFLOWWWWSS" + splitBucket.getNumberOfOverflowBuckets());
 		// traverse each overflow bucket
@@ -356,7 +359,9 @@ public class IndexFile {
 			this.nextPointer = 0;
 			this.numberOfBuckets *= 2;
 			this.round++;
+			
 		}
+		this.writeHeaderInformationToFile();
 	this.splitting = 0;
 	}
 
@@ -395,22 +400,33 @@ public class IndexFile {
 	public ArrayList<Long> getListOfRIDsForColumnValue(Object value) {
 		// Calculate the bucket where we need to look 
 		// for RIDs
+		this.getHeaderInformationFromFile();
+		System.out.println(this.nextPointer + "NP");
 		Integer bucketToBeSearched = getHash(value);
+		System.out.println(bucketToBeSearched + " search bucket");
+		System.out.println(value + " value");
 		Long bucketToBeSearchedOffset = this.headerLength + (long) ((bucketToBeSearched)*sizeOfBucket());
-
+		
 		ArrayList<Long> retValues = new ArrayList<Long>();
 		
 		Bucket search = new Bucket(numberOfEntriesInBucket, (long)-1);
 		search = search.readBucketFromFile(path, bucketToBeSearchedOffset, dataType);
-		
+		if(search == null){
+			System.out.println("read null bucket");
+		}
+		System.out.println(search.getCurrentSize());
 		do{ // Read the Index bucket and all the overflow buckets.
 			for (int i = 0 ; i <search.getCurrentSize() ; i++){
 				// for each bucket - read all the data values.
-				if (search.data[i][0] == value)
+				System.out.println("foudn value " + search.data[i][0]);
+		//		System.out.println(search.data[i][0].getClass());
+				if (search.data[i][0].equals(value.toString())){
+				
 					// If value in the data array matches 
 					// the value that we are searching 
 					// add the RID to the list.
-					retValues.add((Long) search.data[i][1]);
+					retValues.add(Long.parseLong(search.data[i][1].toString()));
+				}
 			}
 			// Read the next Overflow bucket into memory
 			search = search.readBucketFromFile(overFlowPath, search.getOverflowOffset(), dataType);
