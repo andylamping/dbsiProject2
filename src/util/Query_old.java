@@ -12,7 +12,7 @@ import util.HeapFile;
 import util.Record;
 import compare.Comparer;
 
-public class Query {
+public class Query_old {
 	
 	public HeapFile heapFile;
 	private String[] args;
@@ -21,7 +21,7 @@ public class Query {
 	public ArrayList<String> projectionList = new ArrayList<String>();
 	public ArrayList<Integer> matchingRecords;
 	
-	public Query(HeapFile inputHeap, String[] arguments) {
+	public Query_old(HeapFile inputHeap, String[] arguments) {
 		this.heapFile = inputHeap;
 		this.args = arguments;		
 	}

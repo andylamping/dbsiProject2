@@ -66,17 +66,23 @@ public class HeapFile extends MyFile{
 			this.getNumberOfBytesPerRecord();
 			this.getSchemaArrayFromSchema();
 			this.indexData = new int [this.schemaArray.length];
-			int i = 0;
-			while (i < indexData.length){
-				this.indexData[i] = 0;
-				i++;
-			}
-			this.writeHeaderInformationToFile();
+				this.displayIndexData(); // initial Index data.
+				this.writeHeaderInformationToFile();
 			System.out.println("heap file " + this.path +  " created");
 
 		}
 	}
 
+	public void displayIndexData(){
+		/*
+		 * Display the Index Data on the console.
+		 */
+		int i = 0;
+		while (i< indexData.length){
+			this.indexData[i] = 0;
+			i++;
+		}
+	}
 
 	public void writeHeaderInformationToFile(){
 		/*
@@ -187,7 +193,7 @@ public class HeapFile extends MyFile{
 		// Get the union of the existing Index Data 
 		// and the updated Index
 
-		int []tempIndexData = new int[this.numberOfBytesInIndexData];
+		int []tempIndexData = new int[this.indexData.length];
 		for (int i = 0; i< this.indexData.length ; i++){
 			if (this.indexData[i] == 1 || newIndexData[i] == 1)
 				
@@ -203,6 +209,8 @@ public class HeapFile extends MyFile{
 			raf.seek(this.offsetIndexData);
 			System.out.println("rewrote indexdata in heap");
 			raf.write(Helper.toByta(indexData));
+			System.out.print(raf.getFilePointer() + "FP");
+
 			raf.close();
 		} catch (FileNotFoundException e) {
 			System.out.println("To update the Index Data - The file cannot be found");
