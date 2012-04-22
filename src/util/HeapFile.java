@@ -113,7 +113,7 @@ public class HeapFile extends MyFile{
 				raf.write(Helper.toByta(indexData[i]));
 			}
 			this.currentFileOffset = raf.getFilePointer();
-
+			System.out.println(this.currentFileOffset);
 			raf.close();
 
 		} catch (FileNotFoundException e) {
@@ -169,7 +169,7 @@ public class HeapFile extends MyFile{
 			}
 			// Offset after Header information has been read.
 			this.offsetEndOfHeader = this.currentFileOffset = raf.getFilePointer();
-
+			System.out.println(this.offsetEndOfHeader + " EOF");
 			raf.close();
 
 			headerRead = true;
@@ -187,7 +187,7 @@ public class HeapFile extends MyFile{
 		// Get the union of the existing Index Data 
 		// and the updated Index
 
-		int []tempIndexData = new int[this.numberOfBytesInIndexData];
+		int []tempIndexData = new int[this.indexData.length];
 		for (int i = 0; i< this.indexData.length ; i++){
 			if (this.indexData[i] == 1 || newIndexData[i] == 1)
 				
@@ -201,8 +201,10 @@ public class HeapFile extends MyFile{
 		try {
 			raf = new RandomAccessFile(new File(this.path), "rw");
 			raf.seek(this.offsetIndexData);
+			System.out.println(this.offsetIndexData);
 			System.out.println("rewrote indexdata in heap");
 			raf.write(Helper.toByta(indexData));
+			System.out.print(raf.getFilePointer() + "FP");
 			raf.close();
 		} catch (FileNotFoundException e) {
 			System.out.println("To update the Index Data - The file cannot be found");
@@ -313,6 +315,7 @@ public class HeapFile extends MyFile{
 	public String getRecordFromHeapFile(){
 		String result = "";
 		byte [] val;
+		System.out.println(this.currentFileOffset);
 		Comparer comparer = new Comparer();
 		for(int i = 0; i<this.schemaArray.length; i++){
 			val = comparer.compare_functions[schemaArray[i]].read(this.path,(int) this.currentFileOffset, this.lengthArray[i]);
@@ -518,7 +521,7 @@ public class HeapFile extends MyFile{
 			IndexFile iFile = new IndexFile(path+ "." +columnNumber+".lht", path+"."+columnNumber+".lho", dataType);
 			iFile.writeHeaderInformationToFile();
 			iFile.writeInitialBucketsToFile();
-
+			this.getHeaderInformationFromFile();
 			String currentRecord ;
 			Object data;
 			long currentRecordPointer = this.currentFileOffset;
