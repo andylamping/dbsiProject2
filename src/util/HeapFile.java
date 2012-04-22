@@ -540,6 +540,12 @@ public class HeapFile extends MyFile{
 			setIndexOnColumn(columnNumber);
 			updateIndexData(indexData);
 			// Create a new index.
+			
+			// Delete the old index if already present
+			File indexF  = new File (path+ "." +columnNumber+".lht");
+			if (indexF.exists()) indexF.delete();
+			File overflowF = new File(path+"."+columnNumber+".lho");
+			if (overflowF.exists()) overflowF.delete();
 
 			IndexFile iFile = new IndexFile(path+ "." +columnNumber+".lht", path+"."+columnNumber+".lho", dataType);
 			iFile.writeHeaderInformationToFile();
