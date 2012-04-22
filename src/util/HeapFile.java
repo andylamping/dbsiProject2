@@ -332,6 +332,23 @@ public class HeapFile extends MyFile{
 		result = result.substring(0, result.length()-1)+"\n";
 		return result;
 	}
+	
+	public String getRecordByRIDFromHeapFile(Long RID){
+		String result = "";
+
+		byte[] val;
+		Comparer comparer = new Comparer();
+
+		long position = this.currentFileOffset + this.numberOfBytesPerRecord * RID;
+		for(int i = 0; i<this.schemaArray.length; i++){
+			val = comparer.compare_functions[schemaArray[i]].read(this.path,(int) position, this.lengthArray[i]);
+			result += comparer.compare_functions[schemaArray[i]].readString(this.path,(int) position, this.lengthArray[i]) + ",";
+			position += val.length;
+		}
+
+		result = result.substring(0, result.length()-1)+"\n";
+		return result;
+	}
 
 	public String getCertainRecordsFromHeapFile(ArrayList<Integer> matchingRecords){
 		String result = "";
@@ -578,7 +595,7 @@ public class HeapFile extends MyFile{
 	/*
 	 * Check if index already exists on the given column number.
 	 */
-	private boolean indexExistsOnColumn(Integer columnNumber) {
+	public boolean indexExistsOnColumn(Integer columnNumber) {
 		return (this.indexData[columnNumber-1] == 1);
 	}
 	
