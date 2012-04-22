@@ -224,7 +224,7 @@ public class HeapFile extends MyFile{
 		 * the Heap file in bytes.
 		 */
 		String currentRecord = null ;
-		long start = this.currentFileOffset;
+
 		int count  = 0;
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(csvFile.path)));
@@ -233,15 +233,33 @@ public class HeapFile extends MyFile{
 				if (count == 0){
 					this.schema = currentRecord;
 				}else{
+					
 					writeRecordAsByteToHeapFile(currentRecord);
 				}
 				count++;
+				int i = 0;
+				while(count > 1 && i < this.indexData.length){
+					if(this.indexData[i] == 1){
+						int column = i + 1;
+						String dataType = this.schema.split(",")[i];
+						IndexFile iFile = new IndexFile(path+ "." +column+".lht", path+"."+column+".lho", dataType);
+						Object data;
+						data = getAppropriateData(currentRecord, column,dataType);
+						if (data == null){
+							if (Config.DEBUG) System.out.println("Data reading problem");
+						}
+						System.out.println("Inserting" + data);
+						iFile.writeToIndexFile(data, this.currentFileOffset);
+						
+					}
+					i++;
+				}
 				currentRecord = csvFile.getRecordFromFile(br);
 			}
 			// Update the number of records in the Heapfile header.
 			updateNumberOfRecordsInHeapFile(count-1);
 			br.close();
-			appendIndexes(start, count);
+		
 		} catch (FileNotFoundException e) {
 			System.out.println("Write CSV contents to heap file - FILE NOT FOUND!");
 		} catch (IOException e) {
@@ -250,35 +268,6 @@ public class HeapFile extends MyFile{
 
 	}
 
-	private void appendIndexes(long start, int newRecords) {
-		int i = 0;
-		while(i < this.indexData.length){
-			if(this.indexData[i] == 1){
-				String dataType = this.schema.split(",")[i];
-				this.currentFileOffset = start;
-				IndexFile iFile = new IndexFile(path+ "." +i+1+".lht", path+"."+i+1+".lho", dataType);
-				String currentRecord ;
-				Object data;
-				long currentRecordPointer = start;
-				for (int j= 0 ;j < newRecords; j++){
-					
-					currentRecord = this.getRecordFromHeapFile();
-					System.out.println("Current record is" + currentRecord);
-					data = getAppropriateData(currentRecord, j+1,dataType);
-					if (data == null){
-						if (Config.DEBUG) System.out.println("Data reading problem");
-					}
-					System.out.println("Inserting" + data);
-					iFile.writeToIndexFile(data, currentRecordPointer);
-					currentRecordPointer += numberOfBytesPerRecord;
-
-			}
-System.out.println("STUCKKK");
-			}
-			i++;
-		}
-		
-	}
 
 
 	/**
@@ -566,7 +555,7 @@ System.out.println("STUCKKK");
 				if (data == null){
 					if (Config.DEBUG) System.out.println("Data reading problem");
 				}
-				System.out.println("Inserting" + data);
+		//		System.out.println("Inserting" + data);
 				iFile.writeToIndexFile(data, currentRecordPointer);
 				currentRecordPointer += numberOfBytesPerRecord;
 		//	}
@@ -584,7 +573,7 @@ System.out.println("STUCKKK");
 
 		Object retValue = null;
 		String dataToBeReturned = currentRecord.split(",")[columnNumber -1];
-		System.out.println("datatobereturned is " + dataToBeReturned);
+		//System.out.println("datatobereturned is " + dataToBeReturned);
 		switch (type) {
 		case 'c':
 			// If data is a string, we return it as it is.
