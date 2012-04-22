@@ -17,7 +17,7 @@ processOutput();
 
 private void processOutput() {
 //if(this.query.matchingRecords != null){
-	outputFile();
+	outputFileHash();
 //}
 //else if(this.query.hashRecords != null){
 //	outputFile();
@@ -74,10 +74,13 @@ if(this.query.projectionList.isEmpty()){
 // output.getSchemaFromContents();
 // output.writeContentsToFile
 // output.writeRecordToCSVFileUsingBufferedWriter(query.heapFile);
-
+	File f1 = new File("example_output.acsv");
+	f1.delete();
 CSVFile output = new CSVFile("example_output.acsv");
 output.writeDataToFile(this.query.heapFile.schema+"\n");
 for (Long i:this.query.hashRecords){
+	System.out.println(i);
+	
 output.writeDataToFile(this.query.heapFile.getRecordByRIDFromHeapFile(i));
 }
 
@@ -150,7 +153,8 @@ if(this.query.matchingRecords == null){
 }
 output.writeDataToFile(this.query.heapFile.schema+"\n");
 for (Integer i:this.query.matchingRecords){
-output.writeDataToFile(this.query.heapFile.getRecordByRIDFromHeapFile(i));
+	long a = 67;
+output.writeDataToFile(this.query.heapFile.getRecordByRIDFromHeapFile(a));
 }
 
 }
