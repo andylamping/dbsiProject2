@@ -66,23 +66,17 @@ public class HeapFile extends MyFile{
 			this.getNumberOfBytesPerRecord();
 			this.getSchemaArrayFromSchema();
 			this.indexData = new int [this.schemaArray.length];
-				this.displayIndexData(); // initial Index data.
-				this.writeHeaderInformationToFile();
+			int i = 0;
+			while (i < indexData.length){
+				this.indexData[i] = 0;
+				i++;
+			}
+			this.writeHeaderInformationToFile();
 			System.out.println("heap file " + this.path +  " created");
 
 		}
 	}
 
-	public void displayIndexData(){
-		/*
-		 * Display the Index Data on the console.
-		 */
-		int i = 0;
-		while (i< indexData.length){
-			this.indexData[i] = 0;
-			i++;
-		}
-	}
 
 	public void writeHeaderInformationToFile(){
 		/*

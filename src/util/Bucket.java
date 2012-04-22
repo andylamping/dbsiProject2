@@ -120,7 +120,11 @@ public class Bucket {
 			raf.close();
 
 			for (int i = 0; i< this.maxSize ; i++){
-				temp.data[i][0] = comparer.compare_functions[comparer.mapper.indexOf(datatype)].readString(path, (int) tempOffset, Integer.parseInt(datatype.substring(1)));
+				if(datatype.contains("c")){
+					temp.data[i][0] = comparer.compare_functions[6].readString(path, (int) tempOffset, Integer.parseInt(datatype.substring(1)));
+				}
+				else
+					temp.data[i][0] = comparer.compare_functions[comparer.mapper.indexOf(datatype)].readString(path, (int) tempOffset, Integer.parseInt(datatype.substring(1)));
 				tempOffset += Integer.parseInt(datatype.substring(1));
 				
 				temp.data[i][1] = comparer.compare_functions[3].readString(path, (int) tempOffset, 8);

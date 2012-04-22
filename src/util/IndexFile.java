@@ -232,9 +232,22 @@ public class IndexFile {
 		}
 		return b; 
 		**/
-		Integer b = data.hashCode() % this.numberOfBuckets;
+		System.out.println(data.getClass());
+		String str = "hey";
+		if(str.getClass() == data.getClass()){
+			System.out.println("STRING");
+		    str = data.toString();
+			str = str.toLowerCase();
+			Integer b = Math.abs(str.hashCode()) % this.numberOfBuckets;
+			if(b < this.nextPointer)
+				b = Math.abs(str.hashCode()) % (2 * this.numberOfBuckets);
+			System.out.println(str + " !!! " + str.hashCode() + "  " + b);
+			return b;
+		}
+		
+		Integer b = Math.abs(data.hashCode()) % this.numberOfBuckets;
 		if(b < this.nextPointer)
-			b = data.hashCode() % (2 * this.numberOfBuckets);
+			b = Math.abs(data.hashCode()) % (2 * this.numberOfBuckets);
 		System.out.println(data + " !!! " + data.hashCode() + "  " + b);
 		return b;
 	}
