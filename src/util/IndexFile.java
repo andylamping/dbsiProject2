@@ -274,7 +274,7 @@ public class IndexFile {
 	public void split(){
 		this.splitting = 1;
 		// increase number of buckets in index file
-		
+		this.numberOfBuckets++;
 		Bucket freshBucket = new Bucket(numberOfEntriesInBucket, (long) -1);
 		freshBucket.writeData();
 		freshBucket.writeBucketToFile(this.path, this.headerLength + (long) this.numberOfBuckets * sizeOfBucket(), this.dataType);
