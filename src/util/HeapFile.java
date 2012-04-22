@@ -660,7 +660,7 @@ public class HeapFile extends MyFile{
 		String dataType = this.schema.split(",")[columnNumber-1];
 		IndexFile iFile = new IndexFile(path+ "." +columnNumber+".lht", path+"."+columnNumber+".lho", dataType);
 		
-		return iFile.getListOfRIDsForColumnValue(value);
+		return ((IndexFile) iFile).getListOfRIDsForColumnValue(value);
 	}
 
 }

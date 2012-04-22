@@ -290,7 +290,7 @@ public class IndexFile {
 	
 		Bucket freshBucket = new Bucket(numberOfEntriesInBucket, (long) -1);
 		freshBucket.writeData();
-		freshBucket.writeBucketToFile(this.path, this.headerLength + (long) this.numberOfBuckets * sizeOfBucket(), this.dataType);
+		freshBucket.writeBucketToFile(this.path, new File(this.path).length(), this.dataType);
 
 		// set the offset for the current this.nextPointer bucket
 		long offsetSplit = this.headerLength + this.nextPointer * sizeOfBucket();
@@ -328,7 +328,9 @@ public class IndexFile {
 			// add all elements from the overflow bucket
 			while ( index < overflowBucket.getCurrentSize()){
 				Object pluck = overflowBucket.data[index][0];
+				Object ptr = overflowBucket.data[index][1];
 				currentContents.add(pluck);
+				currentContents.add(ptr);
 				System.out.println("Overflow item " + pluck);
 				index++;
 			}
@@ -350,7 +352,7 @@ public class IndexFile {
 			int hash = getHash(data);
 			System.out.println("New hash " + hash);
 			this.writeToIndexFile(data, 0);
-			index++;	
+			index = index + 2;	
 		}
 		
 		
@@ -440,6 +442,5 @@ public class IndexFile {
 	}
 	
 	
-
 
 
