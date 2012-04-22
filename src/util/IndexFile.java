@@ -109,7 +109,7 @@ public class IndexFile {
                 //Read Next Pointer
                 this.offsetNextPtr = this.currentFileOffset = raf.getFilePointer();
                 raf.read(b,0,4);
-                this.columnLength = Helper.toInt(b);
+                this.nextPointer = Helper.toInt(b);
               //Read Number of Buckets
                 this.offsetNumberOfBuckets = this.currentFileOffset = raf.getFilePointer();
                 raf.read(b,0,4);
@@ -287,11 +287,10 @@ public class IndexFile {
 		this.splitting = 1;
 		
 		// increase number of buckets in index file
-	
 		Bucket freshBucket = new Bucket(numberOfEntriesInBucket, (long) -1);
 		freshBucket.writeData();
-		freshBucket.writeBucketToFile(this.path, this.headerLength + (long) this.numberOfBuckets * sizeOfBucket(), this.dataType);
-
+		freshBucket.writeBucketToFile(this.path, new File(this.path).length(), this.dataType);
+		
 		// set the offset for the current this.nextPointer bucket
 		long offsetSplit = this.headerLength + this.nextPointer * sizeOfBucket();
 		// create new bucket to copy that bucket
@@ -306,8 +305,10 @@ public class IndexFile {
 		// get all data items from index bucket
 		while ( index < splitBucket.getCurrentSize()){
 			Object pluck = splitBucket.data[index][0];
-				currentContents.add(pluck);
-		//		System.out.println(pluck);
+			Object ptr = splitBucket.data[index][1];
+			currentContents.add(pluck);
+			currentContents.add(ptr);
+		//	System.out.println(pluck);
 			index++;
 			
 		}
@@ -349,9 +350,10 @@ public class IndexFile {
 		while(index < currentContents.size()){
 			System.out.println("Overflow!" + index);
 			Object data = currentContents.get(index);
+			Object ptr = currentContents.get(index + 1);
 			int hash = getHash(data);
 			System.out.println("New hash " + hash);
-			this.writeToIndexFile(data, 0);
+			this.writeToIndexFile(data, Long.parseLong(ptr.toString()));
 			index = index + 2;	
 		}
 		

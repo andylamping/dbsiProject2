@@ -355,17 +355,17 @@ public class HeapFile extends MyFile{
 
 	public String getRecordByRIDFromHeapFile(Integer RID){
 		String result = "";
-
+		
 		byte[] val;
 		Comparer comparer = new Comparer();
-
-		long position = RID;
+		
+		long position = this.offsetEndOfHeader + (RID ) * this.numberOfBytesPerRecord;
 		for(int i = 0; i<this.schemaArray.length; i++){
 			val = comparer.compare_functions[schemaArray[i]].read(this.path,(int) position, this.lengthArray[i]);
 			result += comparer.compare_functions[schemaArray[i]].readString(this.path,(int) position, this.lengthArray[i]) + ",";
 			position += val.length;
 		}
-
+		System.out.println(result);
 		result = result.substring(0, result.length()-1)+"\n";
 		return result;
 	}
@@ -547,9 +547,13 @@ public class HeapFile extends MyFile{
 			// Create a new index.
 			
 			// Delete the old index if already present
+
 			File indexF  = new File (path+ "." +columnNumber+".lht");
+
 			if (indexF.exists()) indexF.delete();
+
 			File overflowF = new File(path+"."+columnNumber+".lho");
+
 			if (overflowF.exists()) overflowF.delete();
 
 			IndexFile iFile = new IndexFile(path+ "." +columnNumber+".lht", path+"."+columnNumber+".lho", dataType);

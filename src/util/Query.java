@@ -47,16 +47,15 @@ this.addProjections();
 if (projectionList.size() != 0)
 	this.projections = this.computeProjectionArray();
 this.findMatchingRecords();
-//if(this.matchingRecords != null){
-//	System.out.println("has matching records!!");
-//	Output output = new Output(this);
-//}
-if(this.hashRecords != null){
-	System.out.println("matching hash records!");
+if(this.matchingRecords != null){
 	Output output = new Output(this);
 }
-this.findMatchingRecords2();
-// Output output = new Output(this);
+else if(this.hashRecords != null){
+	Output output = new Output(this);
+}
+else{
+	
+}
 }
 private int hasQuery() {
 // scan the arguments to see if there is a condition or projection
@@ -137,7 +136,7 @@ private void addProjections() {
 this.argIndex = 1;
 // if argument contains a p, as in -p1, add this arg to projections and advance to next index
 while(this.argIndex <= (this.args.length - 1)){
-	if(this.args[this.argIndex].contains("p")){
+	if(this.args[this.argIndex].contains("-p")){
 	int columnNumber = Integer.parseInt(this.args[this.argIndex].substring(2));
 	if(columnNumber > heapFile.numberOfFields || columnNumber == 0){
 		System.out.println("Sorry. That column for projection does not exist.");
@@ -416,6 +415,7 @@ else if (hashes == 0){
 	int e = 0;
 	int matchesNeeded = m - 1;
 	if(m == 1){
+		System.out.println(this.matchingRecords.size());
 		return;
 	}
 	while(e < this.matchingRecords.size()){
