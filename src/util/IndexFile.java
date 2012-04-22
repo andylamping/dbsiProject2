@@ -19,7 +19,6 @@ public class IndexFile {
 	private Integer columnLength;
 	private Integer headerLength = 12;
 	private Integer numberOfBuckets = 4;
-	private Integer startBuckets = 4;
 	private Integer round = 1;
 	private Integer splitting = 0;
 	private Integer numberOfEntriesInBucket = Bucket.numberOfEntriesInBucket;
@@ -154,12 +153,12 @@ public class IndexFile {
 			d.writeBucketToFile(path, destinationOffset, dataType);
 		}
 		else {
-
+			System.out.println(d);
 			if (Config.DEBUG) System.out.println("Overflow has occured!!!");
 			Bucket currentBucket = d;
 			Bucket overflowBucket= new Bucket(numberOfEntriesInBucket, (long)-1) ;
 			long currentBucketStartAddress = destinationOffset;
-			System.out.println("here");
+		//	System.out.println("here");
 			/*
 			 * Iterate to empty bucket.
 			 * Assumption - all Buckets are filled to the max.
@@ -167,7 +166,7 @@ public class IndexFile {
 			Iterate:
 			while ((overflowBucketStartAddress = currentBucket.getOverflowOffset()) != -1){
 				overflowBucket = overflowBucket.readBucketFromFile(overFlowPath, overflowBucketStartAddress, dataType);
-				System.out.println("here!!");
+			//	System.out.println("here!!");
 				if (overflowBucket.writeInfoToBucket(data, ptr)){
 					if (Config.DEBUG) System.out.println("Data entered to overflow bucket");
 					writtenToBucket = true;
@@ -180,7 +179,7 @@ public class IndexFile {
 					break Iterate;
 				}
 				currentBucket = overflowBucket;
-				System.out.println("STUCK");
+			//	System.out.println("STUCK");
 				currentBucketStartAddress = overflowBucketStartAddress;
 			}
 			
@@ -233,23 +232,23 @@ public class IndexFile {
 		}
 		return b; 
 		**/
-		System.out.println(data.getClass());
+	//	System.out.println(data.getClass());
 		String str = "hey";
 		if(str.getClass() == data.getClass()){
-			System.out.println("STRING");
+	//		System.out.println("STRING");
 		    str = data.toString();
 			str = str.toLowerCase();
 			Integer b = Math.abs(str.hashCode()) % this.numberOfBuckets;
 			if(b < this.nextPointer)
 				b = Math.abs(str.hashCode()) % (2 * this.numberOfBuckets);
-			System.out.println(str + " !!! " + str.hashCode() + "  " + b);
+		//	System.out.println(str + " !!! " + str.hashCode() + "  " + b);
 			return b;
 		}
 		
 		Integer b = Math.abs(data.hashCode()) % this.numberOfBuckets;
 		if(b < this.nextPointer)
 			b = Math.abs(data.hashCode()) % (2 * this.numberOfBuckets);
-		System.out.println(data + " !!! " + data.hashCode() + "  " + b);
+//		System.out.println(data + " !!! " + data.hashCode() + "  " + b);
 		return b;
 	}
 
@@ -303,7 +302,7 @@ public class IndexFile {
 	
 		// get al
 		int overFlowBucket1 = 0;
-		System.out.println("OVERFLOWWWWSS" + splitBucket.getNumberOfOverflowBuckets());
+	//	System.out.println("OVERFLOWWWWSS" + splitBucket.getNumberOfOverflowBuckets());
 		// traverse each overflow bucket
 		while(overFlowBucket1 < splitBucket.getNumberOfOverflowBuckets()){
 			System.out.println("enter");
@@ -347,7 +346,7 @@ public class IndexFile {
 			this.numberOfBuckets *= 2;
 			this.round++;
 		}
-	
+	this.splitting = 0;
 	}
 
 	/* Getter and Setters */
