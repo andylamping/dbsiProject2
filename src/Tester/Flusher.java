@@ -28,19 +28,23 @@ public class Flusher {
 //		System.out.println("Print C");
 //		System.out.println(c);
 //		System.out.println("done!");
+//		
+//		IndexFile indexFileTest = new IndexFile("indexFILE", "overflowFile","i4");
+//		indexFileTest.writeHeaderInformationToFile();
+//		indexFileTest.writeInitialBucketsToFile();
+//		long ptr = 0;
+//		for (int i = 0; i<10; i++){
+//			indexFileTest.writeToIndexFile(i, ptr);
+//			ptr +=10;
+//		}
+//		File f1 = new File("indexFILE");
+//		f1.delete();
+//		File f2 = new File("overflowFile");
+//		f2.delete();
 		
-		IndexFile indexFileTest = new IndexFile("indexFILE", "overflowFile","i4");
-		indexFileTest.writeHeaderInformationToFile();
-		indexFileTest.writeInitialBucketsToFile();
-		long ptr = 0;
-		for (int i = 0; i<10; i++){
-			indexFileTest.writeToIndexFile(i, ptr);
-			ptr +=10;
-		}
-		File f1 = new File("indexFILE");
-		f1.delete();
-		File f2 = new File("overflowFile");
-		f2.delete();
+		Object data = "Welcome";
+		
+		System.out.println(data.getClass());
 	}
 
 

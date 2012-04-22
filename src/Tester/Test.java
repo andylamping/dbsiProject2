@@ -113,7 +113,7 @@ public class Test {
 				// now, we call the heapFile buildIndex function to build the indexes, if any
 				x = 0;
 				while(x < buildIndexes.size()){
-					hfTarget.buildIndexOnColumn(buildIndexes.get(x));
+					hfTarget.buildIndexOnColumn(buildIndexes.get(x), false);
 					x++;
 				}
 				// and we are done!
@@ -148,7 +148,7 @@ public class Test {
 				// now, we call the heapFile buildIndex function to build the indexes, if any
 				x = 0;
 				while(x < buildIndexes.size()){
-					hfTarget.buildIndexOnColumn(buildIndexes.get(x));
+					hfTarget.buildIndexOnColumn(buildIndexes.get(x), false);
 					x++;
 				}
 				// the indexes have been built
