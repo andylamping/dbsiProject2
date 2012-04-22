@@ -573,15 +573,23 @@ public class HeapFile extends MyFile{
 		indexData[columnNumber] = 1;
 	}
 
-	private void unsetIndexOnColumn(Integer columnNumber){
-		indexData[columnNumber] = 0;
-	}
+
 
 	/*
 	 * Check if index already exists on the given column number.
 	 */
 	private boolean indexExistsOnColumn(Integer columnNumber) {
 		return (this.indexData[columnNumber-1] == 1);
+	}
+	
+	/*
+	 * Returns a list of RIDs that match up to the record
+	 */
+	public ArrayList<Long> getListOfRidsForSelectionCondition(Integer columnNumber,Object value){
+		String dataType = this.schema.split(",")[columnNumber-1];
+		IndexFile iFile = new IndexFile(path+ "." +columnNumber+".lht", path+"."+columnNumber+".lho", dataType);
+		
+		return iFile.getListOfRIDsForColumnValue(value);
 	}
 
 }

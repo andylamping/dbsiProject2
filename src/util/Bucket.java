@@ -88,6 +88,11 @@ public class Bucket {
 	}
 	// TODO Implementation pending
 	public Bucket readBucketFromFile(String path, Long offset, String datatype){
+		
+		// If offset is -1 , return null
+		// Since the bucket cannot be read.
+		if (offset == -1) return null;
+		
 		RandomAccessFile raf;
 		Bucket temp = new Bucket(this.maxSize, (long) -1);
 		byte[] tempData = new byte[4];

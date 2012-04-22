@@ -12,7 +12,7 @@ import util.Query;
 
 
 
-public class Test {
+public class Test_old {
 
 	public static void main (String args[]){
 

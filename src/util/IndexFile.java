@@ -214,88 +214,7 @@ public class IndexFile {
 
 
 	}
-
-	private void insertIntoDestinationBucket_OLD(Integer destinationBucketNumber,
-			Object data, long ptr) {
-		/*
-		 *  ------ DONE -----
-		 *  GOTO nth bucket using formula - 
-		 *  this.currentFileOffset + (Size of each record * n);
-		 *  
-		 *  READ the entire bucket into memory, check if space exists.
-		 *  TODO
-		 *  If yes, then write to memory.
-		 *   else, READ the overflow bucket into memory,
-		 *  	check if space exists.
-		 */
-
-		Long destinationOffset = this.currentFileOffset + ((destinationBucketNumber)*sizeOfBucket());
-
-		Bucket d = new Bucket(this.numberOfEntriesInBucket, (long)-1); 
-		d = d.readBucketFromFile(path, destinationOffset, this.dataType);
-		boolean writtenToBucket = false;
-		if (d.writeInfoToBucket(data, ptr)){
-			// Successfully entered into the same bucket
-			if (Config.DEBUG) System.out.println("Successfully entered into the same bucket");
-			System.out.println(destinationBucketNumber + "  " + d);
-			d.writeBucketToFile(path, destinationOffset, dataType);
-
-
-		}else {
-			/*	No space in the current bucket.
-			 *	Create a new bucket in the overflow file.
-			 *	write the data to the new bucket.
-			 *	
-			 *  TODO Overflow logic. 
-			 */
-			if (Config.DEBUG) System.out.println("Overflow has occurred");
-
-			Bucket nextBucket = d;
-			Long startAddress,tempAddress = destinationOffset ;
-
-			while ((startAddress = nextBucket.getOverflowOffset()) != -1){
-				System.out.println("IN MY FAVORITE WHILE LOOP");
-				nextBucket = nextBucket.readBucketFromFile(overFlowPath, startAddress, this.dataType);
-				if ( (writtenToBucket = nextBucket.writeInfoToBucket(data, ptr))){
-					nextBucket.writeBucketToFile(this.overFlowPath,startAddress , this.dataType);
-					tempAddress = startAddress;
-
-					break;
-				}
-				else continue;
-			}
-			if (!writtenToBucket){
-				Bucket overFlow;
-				/*
-				 * Check if the Bucket exists in the free bucket list.
-				 */
-				if (Bucket.freeBuckets.size()>0){
-					overFlow = Bucket.freeBuckets.remove(0);
-					overFlow.setCurrentSize(0);
-					overFlow.setOverflowOffset(null);
-				}else
-					overFlow = new Bucket(this.numberOfEntriesInBucket, (long) -1);
-
-				nextBucket.setOverflowOffset(this.oFile.currentFileOffset);
-				System.out.println("Written at address :  " + tempAddress);
-				nextBucket.writeBucketToFile(path, tempAddress, dataType);
-				overFlow.writeData();
-
-				if (overFlow.writeInfoToBucket(data, ptr))
-					if (Config.DEBUG)
-						System.out.println("Data entered to overflow bucket!");
-
-				System.out.println("Overflow bucket written at " + this.oFile.currentFileOffset);
-				overFlow.writeBucketToFile(this.overFlowPath, this.oFile.currentFileOffset, this.dataType);
-				System.out.println("Overflow bucket ! " + overFlow);
-			}
-		}
-		//		System.out.println(destinationBucketNumber + "    "+ d);
-
-
-
-	}
-
+	
 	public Integer getHash(Object data){
 		/*
 		 * Compute the hash value of the data.
@@ -445,6 +364,34 @@ public class IndexFile {
 	}
 	public void setHeaderLength(Integer headerLength) {
 		this.headerLength = headerLength;
+	}
+
+	public ArrayList<Long> getListOfRIDsForColumnValue(Object value) {
+		// Calculate the bucket where we need to look 
+		// for RIDs
+		Integer bucketToBeSearched = getHash(value);
+		Long bucketToBeSearchedOffset = this.headerLength + (long) ((bucketToBeSearched)*sizeOfBucket());
+
+		ArrayList<Long> retValues = new ArrayList<Long>();
+		
+		Bucket search = new Bucket(numberOfEntriesInBucket, (long)-1);
+		search = search.readBucketFromFile(path, bucketToBeSearchedOffset, dataType);
+		
+		do{ // Read the Index bucket and all the overflow buckets.
+			for (int i = 0 ; i <search.getCurrentSize() ; i++){
+				// for each bucket - read all the data values.
+				if (search.data[i][0] == value)
+					// If value in the data array matches 
+					// the value that we are searching 
+					// add the RID to the list.
+					retValues.add((Long) search.data[i][1]);
+			}
+			// Read the next Overflow bucket into memory
+			search = search.readBucketFromFile(overFlowPath, search.getOverflowOffset(), dataType);
+		}while (search != null);
+		
+		
+		return retValues;
 	}
 
 
