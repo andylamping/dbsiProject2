@@ -17,7 +17,7 @@ public class IndexFile {
 	private Integer nextPointer;
 	private String dataType;
 	private Integer columnLength;
-	private Integer headerLength = 12;
+	private Integer headerLength = 16;
 	private Integer numberOfBuckets = 4;
 	private Integer round = 1;
 	private Integer splitting = 0;
@@ -28,6 +28,7 @@ public class IndexFile {
 	public long offsetHeaderLength = 0;
 	public long offsetColumnLength ;
 	public long offsetNextPtr ;
+	public long offsetNumberOfBuckets;
 	public long offsetEndOfHeader;
 	public long currentFileOffset;
 
@@ -52,9 +53,10 @@ public class IndexFile {
 	public void writeHeaderInformationToFile (){
 		/*
 		 * Write header information to the Index File
-		 * Header Length -  always 12 bytes 	 - 	length 4 bytes (since we store Integer value)
+		 * Header Length -  always 16 bytes 	 - 	length 4 bytes (since we store Integer value)
 		 * Column Length -	depends on the value - 	length 4 bytes (since we store Integer value)
 		 * next Pointer  -	depends on the value - 	length 4 bytes (since we store Integer value)
+		 * NumofBuckets	 -	depends on the value -	length 4 bytes (since we store Integer value)
 		 */
 		System.out.println("Writing headerinformation to index file");
 		File f = new File(this.path);
@@ -68,6 +70,9 @@ public class IndexFile {
 
 			this.offsetNextPtr = this.currentFileOffset = raf.getFilePointer();
 			raf.write(Helper.toByta(this.nextPointer));
+			
+			this.offsetNumberOfBuckets = this.currentFileOffset = raf.getFilePointer();
+			raf.write(Helper.toByta(this.numberOfBuckets));
 
 			this.offsetEndOfHeader = this.currentFileOffset = raf.getFilePointer();
 
@@ -93,17 +98,23 @@ public class IndexFile {
 			raf.seek(0);
 			raf.read(b, 0, 4);
 			this.headerLength = Helper.toInt(b);
-			this.offsetHeaderLength = this.currentFileOffset = raf.getFilePointer();
 
 			//Read Column Length 
+			this.offsetColumnLength = this.currentFileOffset = raf.getFilePointer();
 			raf.read(b,0,4);
 			this.columnLength = Helper.toInt(b);
-			this.offsetColumnLength = this.currentFileOffset = raf.getFilePointer();
 
 			//Read Next Pointer
+			this.offsetNextPtr = this.currentFileOffset = raf.getFilePointer();
 			raf.read(b,0,4);
 			this.columnLength = Helper.toInt(b);
-			this.offsetNextPtr = this.currentFileOffset = raf.getFilePointer();
+
+			//Read Number of Buckets
+			this.offsetNumberOfBuckets = this.currentFileOffset = raf.getFilePointer();
+			raf.read(b,0,4);
+			this.numberOfBuckets = Helper.toInt(b);
+			
+			this.offsetEndOfHeader = this.currentFileOffset = raf.getFilePointer();
 
 			raf.close();
 
