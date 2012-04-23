@@ -28,7 +28,8 @@ public class CSVFile extends MyFile{
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(path)));
 			int count = 0;
 			// Write the schema to the file
-			bw.write(hfile.schema+"\n");
+			bw.write(hfile.schema);
+			bw.newLine();
 			if (Config.DEBUG) System.out.println(hfile.schema);
 
 			//	Fetch first record from the heap file.
@@ -36,13 +37,14 @@ public class CSVFile extends MyFile{
 			count++;
 
 			for (int i=0 ;i<hfile.numberOfRecords;i++){
-				bw.write(currentRecord+"\n");
+				bw.write(currentRecord);
+				bw.newLine();
 				//	Fetch subsequent records from the heap file.
 				currentRecord = hfile.getRecordFromHeapFile();
 				count++;
 			}
 			bw.close();
-			if (Config.DEBUG) System.out.println(count + "Records written to file");
+			if (Config.DEBUG) System.out.println(count + " Records written to file.");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
