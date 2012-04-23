@@ -429,7 +429,7 @@ public class IndexFile {
 				// for each bucket - read all the data values.
 				System.out.println("foudn value " + search.data[i][0]);
 		//		System.out.println(search.data[i][0].getClass());
-				if (search.data[i][0].equals(value.toString())){
+				if (search.data[i][0].toString().toLowerCase().equals(value.toString().toLowerCase())){
 				
 					// If value in the data array matches 
 					// the value that we are searching 
