@@ -376,8 +376,9 @@ public class IndexFile {
 				index++;
 			}
 			newOverFlowBucketOffsetAddress = overFlowBucketOffsetAddress;
-			overFlowBucket.resetBucket(overFlowPath, overFlowBucketOffsetAddress, dataType);
+		
 			this.oFile.addBucketToFreeList(newOverFlowBucketOffsetAddress);
+			overFlowBucket.resetBucket(overFlowPath, overFlowBucketOffsetAddress, dataType);
 		}
 
 		// all contents of bucket to be split and its overflow buckets now in currentContents
