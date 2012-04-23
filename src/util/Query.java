@@ -547,7 +547,7 @@ public void writeSelectedDataAfterProjectionsOnRecord ( ArrayList<Integer> match
     f1.delete();
     CSVFile csvTarget = new CSVFile("example_output.acsv");
 
-    schema = projectData(this.heapFile.schema)+"\n";
+    schema = projectData(this.heapFile.schema);
     csvTarget.writeDataToFile(schema);
 
     for (Integer i:matchingRecords){
