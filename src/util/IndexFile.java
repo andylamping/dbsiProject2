@@ -38,6 +38,7 @@ public class IndexFile {
 		this.round = 1;
 		this.overFlowPath = overflowPath;
 		this.oFile = new OverflowFile(this.overFlowPath);
+		this.oFile.dataType = this.dataType;
 		this.nextPointer = 0;
 		this.dataType = datatype;
 		this.columnLength = Integer.parseInt(datatype.substring(1));
@@ -289,6 +290,7 @@ public class IndexFile {
 		for (int i = 0; i< this.numberOfBuckets; i++){
 			initial = new Bucket(numberOfEntriesInBucket, (long)-1);
 			initial.writeData();
+			this.oFile.dataType = this.dataType;
 			initial.writeBucketToFile(this.path, offsetForNewBucket, this.dataType);
 			offsetForNewBucket += sizeOfBucket();
 		}
@@ -376,9 +378,9 @@ public class IndexFile {
 				index++;
 			}
 			newOverFlowBucketOffsetAddress = overFlowBucketOffsetAddress;
-		
+			overFlowBucket.resetBucket(this.overFlowPath, overFlowBucketOffsetAddress, dataType);
 			this.oFile.addBucketToFreeList(newOverFlowBucketOffsetAddress);
-			overFlowBucket.resetBucket(overFlowPath, overFlowBucketOffsetAddress, dataType);
+			
 		}
 
 		// all contents of bucket to be split and its overflow buckets now in currentContents
