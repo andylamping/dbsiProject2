@@ -529,7 +529,10 @@ public void writeSelectedDataAfterProjectionsOnRID (ArrayList<Long> matchingReco
 
     schema = projectData(this.heapFile.schema)+"\n";
     csvTarget.writeDataToFile(schema);
-
+    if(this.hashRecords == null){
+    	
+    }
+    else{
     for (Long RID:matchingRecords){
             currentRecord = heapFile.getRecordByRIDFromHeapFile(RID);
             //project data
@@ -539,7 +542,7 @@ public void writeSelectedDataAfterProjectionsOnRID (ArrayList<Long> matchingReco
             csvTarget.writeDataToFile(currentRecord);
     }
 }
-
+}
 public void writeSelectedDataAfterProjectionsOnRecord ( ArrayList<Integer> matchingRecords){
     String schema = "", currentRecord = "";
     long RID;
@@ -549,7 +552,9 @@ public void writeSelectedDataAfterProjectionsOnRecord ( ArrayList<Integer> match
 
     schema = projectData(this.heapFile.schema);
     csvTarget.writeDataToFile(schema);
-
+    if(this.matchingRecords == null){
+    	
+    }else{
     for (Integer i:matchingRecords){
             RID = heapFile.currentFileOffset + (i*heapFile.numberOfBytesPerRecord);
             currentRecord = heapFile.getRecordByRIDFromHeapFile(RID);
@@ -559,6 +564,7 @@ public void writeSelectedDataAfterProjectionsOnRecord ( ArrayList<Integer> match
             //Write the Record to CSV File
             csvTarget.writeDataToFile(currentRecord);
     }
+}
 }
 
 }
