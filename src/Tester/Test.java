@@ -104,7 +104,7 @@ public class Test {
 				int x = 1;
 				while(x < args.length - 2){
 					if(args[x].contains("-b")){
-						int indexToBuild = Integer.parseInt(args[x].substring(args.length-1));
+						int indexToBuild = Integer.parseInt(args[x].substring(args[x].length()-1));
 						buildIndexes.add(indexToBuild);
 					}
 					x++;
