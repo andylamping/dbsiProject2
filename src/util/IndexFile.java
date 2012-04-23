@@ -43,6 +43,9 @@ public class IndexFile {
 		this.dataType = datatype;
 		this.columnLength = Integer.parseInt(datatype.substring(1));
 		this.oFile.dataType = datatype;
+		
+		if (new File(path).exists())
+			getHeaderInformationFromFile();
 	}
 
 	public Integer sizeOfBucket(){
@@ -397,8 +400,10 @@ public class IndexFile {
 		// all contents of bucket to be split and its overflow buckets now in currentContents
 		splitBucket.resetBucket(this.path, this.headerLength + (long) this.nextPointer * sizeOfBucket(), this.dataType);
 		index = 0;
-		System.out.println("Rehashing bucket" + this.nextPointer);
+		System.out.println("Rehashing bucket ---- NEXT POINTER IS " + this.nextPointer);
 		this.nextPointer++;
+		if (Config.DEBUG) System.out.println("NEXT POINTER HAS BEEN INCREMENTED");
+		this.writeHeaderInformationToFile();
 		//	System.out.println(this.nextPointer);
 		while(index < currentContents.size()){
 			System.out.println("Overflow!" + index);
