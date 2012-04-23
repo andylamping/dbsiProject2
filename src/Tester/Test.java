@@ -23,7 +23,7 @@ public class Test {
 		if (args.length == 1){
 			HeapFile heapFile = new HeapFile(args[0], true, null, null);
 
-			CSVFile csvTarget = new CSVFile("example_result.acsv");
+			CSVFile csvTarget = new CSVFile("example_output.acsv");
 			// Write the information(Schema and Records to the 
 			// CSVFile in the byte format.
 			csvTarget.writeRecordToCSVFileUsingBufferedWriter(heapFile);
@@ -104,7 +104,7 @@ public class Test {
 				int x = 1;
 				while(x < args.length - 2){
 					if(args[x].contains("-b")){
-						int indexToBuild = Integer.parseInt(args[x].substring(args.length-1));
+						int indexToBuild = Integer.parseInt(args[x].substring(args[x].length()-1));
 						buildIndexes.add(indexToBuild);
 					}
 					x++;
