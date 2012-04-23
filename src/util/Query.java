@@ -57,6 +57,8 @@ public void processQuery (){
 public void writeAllDataAfterProjection(){
     String currentRecord, schema;
     long RID;
+    File f1 = new File("example_output.acsv");
+    f1.delete();
     CSVFile csvTarget = new CSVFile("example_output.acsv");
     /* If no selection conditions then we must fetch all the records. */
     if (conditionList.size() == 0){
