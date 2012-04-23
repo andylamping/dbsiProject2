@@ -71,8 +71,8 @@ public class CSVFile extends MyFile{
 		BufferedWriter bw;
 		try {
 			bw = new BufferedWriter(new FileWriter(path, true));
-//			bw.newLine();
 			bw.write(string);
+			bw.newLine();
 			bw.close();
 
 		} catch (IOException e) {
