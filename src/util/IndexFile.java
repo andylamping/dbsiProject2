@@ -20,7 +20,7 @@ public class IndexFile {
 	private Integer headerLength = 20;
 	private Integer numberOfBuckets = 4;
 	public long offsetNumberOfBuckets;
-	private Integer round = 1;
+	private Integer round;
 	private Integer splitting = 0;
 	private Integer numberOfEntriesInBucket = Bucket.numberOfEntriesInBucket;
 	public OverflowFile oFile; 
@@ -35,6 +35,7 @@ public class IndexFile {
 
 	public IndexFile (String path, String overflowPath, String datatype){
 		this.path = path;
+		this.round = 1;
 		this.overFlowPath = overflowPath;
 		this.oFile = new OverflowFile(this.overFlowPath);
 		this.nextPointer = 0;
@@ -326,8 +327,9 @@ public class IndexFile {
 		// traverse each overflow bucket
 		while(overFlowBucket1 < x){
 			System.out.println("enter" + splitBucket.getNumberOfOverflowBuckets());
-			Bucket overflowBucket = splitBucket.readBucketFromFile(this.overFlowPath, splitBucket.getOverflowOffset() - overFlowBucket1 * sizeOfBucket(), this.dataType);
-
+			Bucket overflowBucket = splitBucket.readBucketFromFile(this.overFlowPath, splitBucket.getOverflowOffset() + (overFlowBucket1 * sizeOfBucket()), this.dataType);
+			if(this.nextPointer == 3)
+				System.out.println(overflowBucket);
 		
 			index = 0;
 
@@ -370,10 +372,12 @@ public class IndexFile {
 		
 		
 		
-		if(this.nextPointer == this.numberOfBuckets * (this.round + 1) - 1){
-		//	System.out.println("********************");
+		if(this.nextPointer == this.numberOfBuckets * (this.round + 1)){
+			System.out.println("******************** " + this.nextPointer );
 			this.nextPointer = 0;
-			this.numberOfBuckets *= 2;
+			this.numberOfBuckets = 2 * this.numberOfBuckets;
+			System.out.println("num buck " + this.numberOfBuckets);
+			System.out.println(this.numberOfBuckets * (this.round + 1) - 1 + "aaaaa");
 			this.round++;
 			
 		}
