@@ -48,12 +48,6 @@ public class Compare_i2 implements Compare {
 	}
 
 	@Override
-	public int write(String path,byte data, int offset, int length) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
 	public long write(String path,long offset, String data, int length) {
 		// TODO Auto-generated method stub
 
@@ -83,6 +77,12 @@ public class Compare_i2 implements Compare {
 	public String readString(String path, int offset, int length) {
 		String s = (Helper.toInt2(read (path, offset, length)) +"");
 		return s;
+	}
+	
+	@Override
+	public String readStringAtOffset(RandomAccessFile raf, long offset,
+			int length) {
+		return (Helper.toInt2(readAtOffset(raf, offset, length))+"");
 	}
 
 	@Override
@@ -119,5 +119,7 @@ public class Compare_i2 implements Compare {
 		}
 		return val;
 	}
+
+	
 
 }

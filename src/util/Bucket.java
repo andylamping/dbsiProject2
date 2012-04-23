@@ -32,7 +32,7 @@ public class Bucket {
 		this.overflowOffset = overflowOffset;
 		this.data = new Object [this.maxSize][2];
 	}
-	
+
 	public void writeBucketToFile(String path, Long offset, String datatype){
 
 		//		this.writeData(); // For testing purposes.
@@ -88,16 +88,16 @@ public class Bucket {
 			this.currentSize ++;
 			return true;
 		}
-		
-		
+
+
 	}
 	// TODO Implementation pending
 	public Bucket readBucketFromFile(String path, Long offset, String datatype){
-		
+
 		// If offset is -1 , return null
 		// Since the bucket cannot be read.
 		if (offset == -1) return null;
-		
+
 		RandomAccessFile raf;
 		Bucket temp = new Bucket(this.maxSize, (long) -1);
 		byte[] tempData = new byte[4];
@@ -114,23 +114,23 @@ public class Bucket {
 			temp.currentSize = Helper.toInt(tempData);
 			raf.read(tempData);
 			temp.numberOfOverflowBuckets = Helper.toInt(tempData);
-			
+
 			raf.read(tempOffsetAddress);
 			temp.overflowOffset = Helper.toLong(tempOffsetAddress);
 			tempOffset = raf.getFilePointer();
-			raf.close();
 
 			for (int i = 0; i< this.maxSize ; i++){
 				if(datatype.contains("c")){
-					temp.data[i][0] = comparer.compare_functions[6].readString(path, (int) tempOffset, Integer.parseInt(datatype.substring(1)));
+					temp.data[i][0] = comparer.compare_functions[6].readStringAtOffset(raf, (int) tempOffset, Integer.parseInt(datatype.substring(1)));
 				}
 				else
-					temp.data[i][0] = comparer.compare_functions[comparer.mapper.indexOf(datatype)].readString(path, (int) tempOffset, Integer.parseInt(datatype.substring(1)));
+					temp.data[i][0] = comparer.compare_functions[comparer.mapper.indexOf(datatype)].readStringAtOffset(raf, (int) tempOffset, Integer.parseInt(datatype.substring(1)));
 				tempOffset += Integer.parseInt(datatype.substring(1));
-				
+
 				temp.data[i][1] = comparer.compare_functions[3].readString(path, (int) tempOffset, 8);
 				tempOffset += 8;
 			}
+			raf.close();
 
 			return temp;
 		}catch(FileNotFoundException e){
@@ -189,7 +189,7 @@ public class Bucket {
 		result += "MAXSIZE = "+ this.maxSize+ "\n";
 		result += "NUMBER OF OVERFLOW BUCKETS ARE " +this.numberOfOverflowBuckets +"\n";
 		result += "DATA IS \n";
-				for (int i = 0; i < this.maxSize; i++){
+		for (int i = 0; i < this.maxSize; i++){
 			for (int j = 0; j<2; j++)
 				result += this.data[i][j] + "\t";
 			result += "\n";
@@ -207,8 +207,8 @@ public class Bucket {
 		this.data [2][0]= -1;	this.data[2][1] = -1;
 		this.data [3][0]= -1;	this.data[3][1] = -1;
 		this.writeBucketToFile(path, offset, datatype);
-		
-		
+
+
 	}
 
 

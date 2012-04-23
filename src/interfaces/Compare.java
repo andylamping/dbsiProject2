@@ -12,13 +12,13 @@ public int compare(byte[] record1,
 
 public byte[] read(String path, int offset, int length);
 
-public int write (String path, byte data, int offset, int length);
-
 public long write (String path, long offset, String data, int length);
 
 public String readString (String path, int offset, int length);
 
 public long writeAtOffset(RandomAccessFile raf,long offset, String data, int length);
+
+public String readStringAtOffset(RandomAccessFile raf, long offset, int length);
 
 public byte[] readAtOffset (RandomAccessFile raf,long offset, int length);
 }

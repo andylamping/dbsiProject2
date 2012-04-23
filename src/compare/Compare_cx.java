@@ -52,11 +52,6 @@ public class Compare_cx implements Compare {
 		return val;
 	}
 
-	@Override
-	public int write(String path, byte data, int offset, int length) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
 
 	@Override
 	public long write(String path, long offset, String data, int length) {
@@ -129,6 +124,11 @@ public class Compare_cx implements Compare {
 	}
 
 	@Override
+	public String readStringAtOffset(RandomAccessFile raf, long offset, int length) {
+		return Helper.toString(readAtOffset(raf, offset, length));
+	}
+	
+	@Override
 	public byte[] readAtOffset(RandomAccessFile raf, long offset, int length) {
 		byte [] val = new byte [length];
 
@@ -143,5 +143,7 @@ public class Compare_cx implements Compare {
 
 		return val;
 	}
+
+	
 
 }

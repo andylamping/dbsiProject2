@@ -17,8 +17,7 @@ public class IndexFile {
 	public Integer nextPointer;
 	private String dataType;
 	private Integer columnLength;
-//	private Integer headerLength = 12;
-	private Integer headerLength = 16;
+	private Integer headerLength = 20;
 	private Integer numberOfBuckets = 4;
 	public long offsetNumberOfBuckets;
 	private Integer round = 1;
@@ -30,6 +29,7 @@ public class IndexFile {
 	public long offsetHeaderLength = 0;
 	public long offsetColumnLength ;
 	public long offsetNextPtr ;
+	public long offsetRound;
 	public long offsetEndOfHeader;
 	public long currentFileOffset;
 
@@ -73,8 +73,10 @@ public class IndexFile {
 			raf.write(Helper.toByta(this.nextPointer));
 			
 			this.offsetNumberOfBuckets = this.currentFileOffset = raf.getFilePointer();
-
 			raf.write(Helper.toByta(this.numberOfBuckets));
+			
+			this.offsetRound = this.currentFileOffset = raf.getFilePointer();
+			raf.write(Helper.toByta(this.round));
 
 			this.offsetEndOfHeader = this.currentFileOffset = raf.getFilePointer();
 
@@ -114,6 +116,11 @@ public class IndexFile {
                 this.offsetNumberOfBuckets = this.currentFileOffset = raf.getFilePointer();
                 raf.read(b,0,4);
                 this.numberOfBuckets = Helper.toInt(b);
+                
+                //Read round number
+                this.offsetRound = this.currentFileOffset = raf.getFilePointer();
+                raf.read(b,0,4);
+                this.round = Helper.toInt(b);
                 
                 this.offsetEndOfHeader = this.currentFileOffset = raf.getFilePointer();
 

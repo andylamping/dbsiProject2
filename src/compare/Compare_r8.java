@@ -53,12 +53,6 @@ public class Compare_r8 implements Compare {
 	}
 
 	@Override
-	public int write(String path, byte data, int offset, int length) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
 	public long write(String path, long offset, String data, int length) {
 		// TODO Auto-generated method stub
 
@@ -86,6 +80,13 @@ public class Compare_r8 implements Compare {
 	public String readString(String path, int offset, int length) {
 		return (Helper.toDouble(read (path, offset, length)) +"");
 	}
+	
+	@Override
+	public String readStringAtOffset(RandomAccessFile raf, long offset,
+			int length) {
+		return (Helper.toDouble(readAtOffset(raf, offset, length))+"");
+	}
+
 
 	@Override
 	public long writeAtOffset(RandomAccessFile raf, long offset, String data,
@@ -120,5 +121,6 @@ public class Compare_r8 implements Compare {
 		}
 		return val;
 	}
+
 
 }

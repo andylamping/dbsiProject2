@@ -25,7 +25,7 @@ public class CsvMaker {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter("input.acsv"));
 			bw.write("c9,c9,i2,r4" +"\n");
-			for (int i = 0; i < 10000; i++){
+			for (int i = 0; i < 1000000; i++){
 				bw.write(firstNames[(int) (Math.random()*10)]+","+
 						lastNames[(int) (Math.random()*10)]+","+
 						year[(int)(Math.random()*9)]+","+
