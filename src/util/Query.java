@@ -44,18 +44,26 @@ public class Query {
 		this.addConditions();
 		this.argIndex = 1;
 		this.addProjections();
-		if (projectionList.size() != 0)
-			this.projections = this.computeProjectionArray();
-		this.findMatchingRecords();
-		if(this.matchingRecords != null){
-			Output output = new Output(this);
+		//		if (projectionList.size() != 0)
+		//			this.projections = this.computeProjectionArray();
+		//		this.findMatchingRecords();
+		//		if(this.matchingRecords != null){
+		//			Output output = new Output(this);
+		//		}
+		//		else if(this.hashRecords != null){
+		//			Output output = new Output(this);
+		//		}
+		//		else{
+		//
+		//		}
+		if (this.conditionList.size() !=0){
+			this.findMatchingRecords();
+			this.writeSelectedDataAfterProjections();
 		}
-		else if(this.hashRecords != null){
-			Output output = new Output(this);
+		else if (this.projectionList.size() != 0){
+			this.writeAllDataAfterProjection();
 		}
-		else{
 
-		}
 	}
 	private int hasQuery() {
 		// scan the arguments to see if there is a condition or projection
@@ -453,7 +461,7 @@ public class Query {
 		System.out.println("projections size in CPA is " + projections.size());
 		return projections;
 	}
-	public void findMatchingRecords2(){
+	public void writeAllDataAfterProjection(){
 		String currentRecord, schema;
 		long RID;
 		CSVFile csvTarget = new CSVFile("example_output.acsv");
@@ -485,25 +493,42 @@ public class Query {
 	 * Writes the Record numbers in this.matchingRecords ,
 	 * after Projections to the file, example_output.acsv.
 	 */
-	public void writeSelectedDataAfterProjections (){
+	public void writeSelectedDataAfterProjectionsOnRecord ( ArrayList<Integer> matchingRecords){
 		String schema = "", currentRecord = "";
 		long RID;
 		CSVFile csvTarget = new CSVFile("example_output.acsv");
-		
+
 		schema = projectData(this.heapFile.schema);
 		csvTarget.writeDataToFile(schema);
-		
+
 		for (Integer i:matchingRecords){
 			RID = heapFile.currentFileOffset + (i*heapFile.numberOfBytesPerRecord);
 			currentRecord = heapFile.getRecordByRIDFromHeapFile(RID);
 			//project data 
 			currentRecord = projectData(currentRecord);
-			
+
 			//Write the Record to CSV File
 			csvTarget.writeDataToFile(currentRecord);
 		}
 	}
-	
+
+	public void writeSelectedDataAfterProjectionsOnRID (ArrayList<Long> matchingRecords){
+		String schema = "", currentRecord = "";
+
+		CSVFile csvTarget = new CSVFile("example_output.acsv");
+
+		schema = projectData(this.heapFile.schema);
+		csvTarget.writeDataToFile(schema);
+
+		for (Long RID:matchingRecords){
+			currentRecord = heapFile.getRecordByRIDFromHeapFile(RID);
+			//project data 
+			currentRecord = projectData(currentRecord);
+
+			//Write the Record to CSV File
+			csvTarget.writeDataToFile(currentRecord);
+		}
+	}
 	public String projectData (String data){
 		if (projectionList.size() != 0){
 			String []dataElements = data.split(",");
