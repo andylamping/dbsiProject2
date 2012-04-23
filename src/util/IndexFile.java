@@ -41,6 +41,7 @@ public class IndexFile {
 		this.nextPointer = 0;
 		this.dataType = datatype;
 		this.columnLength = Integer.parseInt(datatype.substring(1));
+		this.oFile.dataType = datatype;
 	}
 
 	public Integer sizeOfBucket(){
@@ -284,6 +285,7 @@ public class IndexFile {
 	public void writeInitialBucketsToFile (){
 
 		Bucket initial ;
+		this.oFile.dataType = this.dataType;
 		long offsetForNewBucket = this.currentFileOffset;
 		System.out.println(this.dataType);
 		for (int i = 0; i< this.numberOfBuckets; i++){

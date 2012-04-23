@@ -80,6 +80,7 @@ public class OverflowFile {
 	
 	public void addBucketToFreeList(long ptr){
 		Bucket b = new Bucket(Bucket.numberOfEntriesInBucket, (long) -1);
+		b.writeData();
 		b = b.readBucketFromFile(path, ptr, dataType);
 		b.setOverflowOffset(this.freeBucketList);
 		this.freeBucketList = ptr;
