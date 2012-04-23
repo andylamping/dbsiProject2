@@ -200,6 +200,7 @@ public class Bucket {
 	// called by split after all elements from the bucket have been plucked
 	public void resetBucket(String path, long offset, String datatype){
 		Bucket reset = new Bucket(numberOfEntriesInBucket, offset);
+		reset = reset.readBucketFromFile(path, offset, datatype);
 		reset.setOverflowOffset((long)-1);
 		reset.setNumberOfOverflowBuckets(0);
 		reset.setCurrentSize(0);
