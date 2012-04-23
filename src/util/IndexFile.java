@@ -167,6 +167,7 @@ public class IndexFile {
 
 		long overflowBucketStartAddress, lastOverflowBucketStartAddress = 0;
 		boolean writtenToBucket = false;
+		boolean reuse = false;
 		if (d.writeInfoToBucket(data, ptr)){
 			if (Config.DEBUG) System.out.println("Successfully entered into the same bucket");
 			writtenToBucket = true;
@@ -200,7 +201,7 @@ public class IndexFile {
 						break Iterate;
 					}
 					currentBucket = overflowBucket;
-					//	System.out.println("STUCK");
+					System.out.println("STUCK");
 					currentBucketStartAddress = overflowBucketStartAddress;
 				}
 
@@ -210,12 +211,19 @@ public class IndexFile {
 				if ((newOverflowBucketStartAddress =  this.oFile.getBucketFromFreeList()) == -1){
 					File f = new File(overFlowPath);
 					newOverflowBucketStartAddress = f.length();
+					reuse = false;
+				}else{
+					reuse = true;
 				}
 
-				overflowBucket = overflowBucket.readBucketFromFile(overFlowPath, newOverflowBucketStartAddress, dataType);
+				if (reuse)
+					overflowBucket = overflowBucket.readBucketFromFile(overFlowPath, newOverflowBucketStartAddress, dataType);
+				else
+					overflowBucket = new Bucket(numberOfEntriesInBucket, (long)-1);
+
 				overflowBucket.writeData();
 				overflowBucket.writeInfoToBucket(data, ptr);
-				
+
 				overflowBucket.writeBucketToFile(overFlowPath, newOverflowBucketStartAddress, dataType);
 				if (Config.DEBUG) System.out.println("Inserted into new bucket " + overflowBucket);
 
@@ -331,46 +339,46 @@ public class IndexFile {
 
 		// get al
 
-//		int overFlowBucket1 = 0;
-//		int x = splitBucket.getNumberOfOverflowBuckets();
-//		//	System.out.println("OVERFLOWWWWSS" + splitBucket.getNumberOfOverflowBuckets());
-//		// traverse each overflow bucket
-//		while(overFlowBucket1 < x){
-//			System.out.println("enter" + splitBucket.getNumberOfOverflowBuckets());
-//			Bucket overflowBucket = splitBucket.readBucketFromFile(this.overFlowPath, splitBucket.getOverflowOffset() + (overFlowBucket1 * sizeOfBucket()), this.dataType);
-//			if(this.nextPointer == 3)
-//				System.out.println(overflowBucket);
-//
-//			index = 0;
-//
-//			// add all elements from the overflow bucket
-//			while ( index < overflowBucket.getCurrentSize()){
-//				Object pluck = overflowBucket.data[index][0];
-//				Object ptr = overflowBucket.data[index][1];
-//				currentContents.add(pluck);
-//				currentContents.add(ptr);
-//				System.out.println("Overflow item " + pluck);
-//				index++;
-//			}
-//
-//			// reset this overflow bucket
-//
-//			overFlowBucket1++;
-//		}
-//
-//		overFlowBucket1 = 0;
-//		while (overFlowBucket1 < x){
-//			splitBucket.resetBucket(this.overFlowPath, splitBucket.getOverflowOffset() - overFlowBucket1 * sizeOfBucket(), this.dataType);
-//			overFlowBucket1++;
-//		}
+		//		int overFlowBucket1 = 0;
+		//		int x = splitBucket.getNumberOfOverflowBuckets();
+		//		//	System.out.println("OVERFLOWWWWSS" + splitBucket.getNumberOfOverflowBuckets());
+		//		// traverse each overflow bucket
+		//		while(overFlowBucket1 < x){
+		//			System.out.println("enter" + splitBucket.getNumberOfOverflowBuckets());
+		//			Bucket overflowBucket = splitBucket.readBucketFromFile(this.overFlowPath, splitBucket.getOverflowOffset() + (overFlowBucket1 * sizeOfBucket()), this.dataType);
+		//			if(this.nextPointer == 3)
+		//				System.out.println(overflowBucket);
+		//
+		//			index = 0;
+		//
+		//			// add all elements from the overflow bucket
+		//			while ( index < overflowBucket.getCurrentSize()){
+		//				Object pluck = overflowBucket.data[index][0];
+		//				Object ptr = overflowBucket.data[index][1];
+		//				currentContents.add(pluck);
+		//				currentContents.add(ptr);
+		//				System.out.println("Overflow item " + pluck);
+		//				index++;
+		//			}
+		//
+		//			// reset this overflow bucket
+		//
+		//			overFlowBucket1++;
+		//		}
+		//
+		//		overFlowBucket1 = 0;
+		//		while (overFlowBucket1 < x){
+		//			splitBucket.resetBucket(this.overFlowPath, splitBucket.getOverflowOffset() - overFlowBucket1 * sizeOfBucket(), this.dataType);
+		//			overFlowBucket1++;
+		//		}
 		Bucket overFlowBucket = splitBucket;
 		long overFlowBucketOffsetAddress = 0, newOverFlowBucketOffsetAddress;
-		
+
 		while ((overFlowBucketOffsetAddress = overFlowBucket.getOverflowOffset()) != -1){
 			// Add all the data for each overflowBucket to currentContents 
 			// and reset the bucket
 			overFlowBucket = overFlowBucket.readBucketFromFile(overFlowPath, overFlowBucketOffsetAddress, dataType);
-			
+
 			index = 0;
 			while (index < overFlowBucket.getCurrentSize()){
 				Object pluck = overFlowBucket.data[index][0];
@@ -383,7 +391,7 @@ public class IndexFile {
 			newOverFlowBucketOffsetAddress = overFlowBucketOffsetAddress;
 			overFlowBucket.resetBucket(this.overFlowPath, overFlowBucketOffsetAddress, dataType);
 			this.oFile.addBucketToFreeList(newOverFlowBucketOffsetAddress);
-			
+
 		}
 
 		// all contents of bucket to be split and its overflow buckets now in currentContents
