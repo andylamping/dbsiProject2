@@ -23,7 +23,7 @@ public class Test {
 		if (args.length == 1){
 			HeapFile heapFile = new HeapFile(args[0], true, null, null);
 
-			CSVFile csvTarget = new CSVFile("example_result.acsv");
+			CSVFile csvTarget = new CSVFile("example_output.acsv");
 			// Write the information(Schema and Records to the 
 			// CSVFile in the byte format.
 			csvTarget.writeRecordToCSVFileUsingBufferedWriter(heapFile);
