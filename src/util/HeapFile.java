@@ -296,14 +296,22 @@ public class HeapFile extends MyFile{
 	public long writeRecordAsByteToHeapFileUsingRAF(RandomAccessFile raf, String record){
 		Comparer comparer = new Comparer();
 		String s[] = record.split(",");
-		long startOffsetForRecord = this.currentFileOffset;
-		for (int j = 0; j<s.length ; j++){
-			comparer.compare_functions[schemaArray[j]].writeAtOffset(raf, currentFileOffset, s[j], lengthArray[j]);
-			this.currentFileOffset += lengthArray[j];
-		}
-		if (Config.DEBUG) System.out.println("Record written to the file");
+		try {
+			raf.seek(new File(path).length());
+			long startOffsetForRecord = this.currentFileOffset = raf.getFilePointer();
+			for (int j = 0; j<s.length ; j++){
+				comparer.compare_functions[schemaArray[j]].writeAtOffset(raf, currentFileOffset, s[j], lengthArray[j]);
+				this.currentFileOffset += lengthArray[j];
+			}
+			if (Config.DEBUG) System.out.println("Record written to the file");
 
-		return startOffsetForRecord;
+			return startOffsetForRecord;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return 0;
+		
 	}
 
 	public void getNumberOfBytesPerRecord (){

@@ -127,7 +127,7 @@ public class Bucket {
 					temp.data[i][0] = comparer.compare_functions[comparer.mapper.indexOf(datatype)].readStringAtOffset(raf, (int) tempOffset, Integer.parseInt(datatype.substring(1)));
 				tempOffset += Integer.parseInt(datatype.substring(1));
 
-				temp.data[i][1] = comparer.compare_functions[3].readString(path, (int) tempOffset, 8);
+				temp.data[i][1] = comparer.compare_functions[3].readStringAtOffset(raf, (int) tempOffset, 8);
 				tempOffset += 8;
 			}
 			raf.close();
