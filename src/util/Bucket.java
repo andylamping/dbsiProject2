@@ -198,16 +198,19 @@ public class Bucket {
 	}
 	// this resets a bucket 
 	// called by split after all elements from the bucket have been plucked
-	public void resetBucket(String path, long offset, String datatype){ Bucket reset = new Bucket(numberOfEntriesInBucket, offset);
+	public void resetBucket(String path, long offset, String datatype){
+		Bucket reset = new Bucket(numberOfEntriesInBucket, offset);
+		reset.setOverflowOffset((long)-1);
+		reset.setNumberOfOverflowBuckets(0);
+		reset.setCurrentSize(0);
+		reset.data [0][0]= -1; 	reset.data[0][1] = -1;
+		reset.data [1][0]= -1; 	reset.data[1][1] = -1;
+		reset.data [2][0]= -1;	reset.data[2][1] = -1;
+		reset.data [3][0]= -1;	reset.data[3][1] = -1;
+		reset.writeBucketToFile(path, offset, datatype);
 
-	reset.setOverflowOffset((long)-1);	
-	reset.setNumberOfOverflowBuckets(0);	
-	reset.setCurrentSize(0);	
-	reset.data [0][0]= -1;   reset.data[0][1] = -1;
-	reset.data [1][0]= -1;   reset.data[1][1] = -1;
-	reset.data [2][0]= -1;  reset.data[2][1] = -1;
-	reset.data [3][0]= -1;  reset.data[3][1] = -1;
-	reset.writeBucketToFile(path, offset, datatype);}
+
+	}
 
 
 }
