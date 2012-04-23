@@ -40,6 +40,7 @@ public class IndexFile {
 		this.nextPointer = 0;
 		this.dataType = datatype;
 		this.columnLength = Integer.parseInt(datatype.substring(1));
+		this.oFile.dataType = datatype;
 	}
 
 	public Integer sizeOfBucket(){
@@ -47,7 +48,7 @@ public class IndexFile {
 		// * Integer - maxSize + currentSize + Long - OffsetPointer + size of the 2D Object Data array 
 		 * Integer - maxSize + currentSize + number of Buckets +Long - OffsetPointer + size of the 2D Object Data array
 		 */
-	//	return (4 + 4 + 8 +(this.numberOfEntriesInBucket * (this.columnLength + 8)));
+		//	return (4 + 4 + 8 +(this.numberOfEntriesInBucket * (this.columnLength + 8)));
 		return (4 + 4 + 4 +8 +(this.numberOfEntriesInBucket * (this.columnLength + 8)));
 	}
 
@@ -71,10 +72,10 @@ public class IndexFile {
 			System.out.println("writing pointer!!" + this.nextPointer);
 			this.offsetNextPtr = this.currentFileOffset = raf.getFilePointer();
 			raf.write(Helper.toByta(this.nextPointer));
-			
+
 			this.offsetNumberOfBuckets = this.currentFileOffset = raf.getFilePointer();
 			raf.write(Helper.toByta(this.numberOfBuckets));
-			
+
 			this.offsetRound = this.currentFileOffset = raf.getFilePointer();
 			raf.write(Helper.toByta(this.round));
 
@@ -91,49 +92,49 @@ public class IndexFile {
 	}
 
 	public void getHeaderInformationFromFile(){
-        File f = new File(this.path);
+		File f = new File(this.path);
 
-        RandomAccessFile raf;
-        try {
-                raf = new RandomAccessFile(f, "rw");
-                byte [] b = new byte [4];
+		RandomAccessFile raf;
+		try {
+			raf = new RandomAccessFile(f, "rw");
+			byte [] b = new byte [4];
 
-                //Read Header Length
-                raf.seek(0);
-                raf.read(b, 0, 4);
-                this.headerLength = Helper.toInt(b);
+			//Read Header Length
+			raf.seek(0);
+			raf.read(b, 0, 4);
+			this.headerLength = Helper.toInt(b);
 
-                //Read Column Length
-                this.offsetColumnLength = this.currentFileOffset = raf.getFilePointer();
-                raf.read(b,0,4);
-                this.columnLength = Helper.toInt(b);
+			//Read Column Length
+			this.offsetColumnLength = this.currentFileOffset = raf.getFilePointer();
+			raf.read(b,0,4);
+			this.columnLength = Helper.toInt(b);
 
-                //Read Next Pointer
-                this.offsetNextPtr = this.currentFileOffset = raf.getFilePointer();
-                raf.read(b,0,4);
-                this.nextPointer = Helper.toInt(b);
-              //Read Number of Buckets
-                this.offsetNumberOfBuckets = this.currentFileOffset = raf.getFilePointer();
-                raf.read(b,0,4);
-                this.numberOfBuckets = Helper.toInt(b);
-                
-                //Read round number
-                this.offsetRound = this.currentFileOffset = raf.getFilePointer();
-                raf.read(b,0,4);
-                this.round = Helper.toInt(b);
-                
-                this.offsetEndOfHeader = this.currentFileOffset = raf.getFilePointer();
+			//Read Next Pointer
+			this.offsetNextPtr = this.currentFileOffset = raf.getFilePointer();
+			raf.read(b,0,4);
+			this.nextPointer = Helper.toInt(b);
+			//Read Number of Buckets
+			this.offsetNumberOfBuckets = this.currentFileOffset = raf.getFilePointer();
+			raf.read(b,0,4);
+			this.numberOfBuckets = Helper.toInt(b);
 
-                raf.close();
+			//Read round number
+			this.offsetRound = this.currentFileOffset = raf.getFilePointer();
+			raf.read(b,0,4);
+			this.round = Helper.toInt(b);
 
-        } catch (FileNotFoundException e) {
-                System.out.println("IndexFile - Get Header Info from File - File not Found!");
-                e.printStackTrace();
-        } catch (IOException e) {
-                e.printStackTrace();
-        }
+			this.offsetEndOfHeader = this.currentFileOffset = raf.getFilePointer();
 
-}
+			raf.close();
+
+		} catch (FileNotFoundException e) {
+			System.out.println("IndexFile - Get Header Info from File - File not Found!");
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
 	/*
 	 * TODO 
 	 * Accept Data, get hashcode
@@ -176,48 +177,51 @@ public class IndexFile {
 			Bucket currentBucket = d;
 			Bucket overflowBucket= new Bucket(numberOfEntriesInBucket, (long)-1) ;
 			long currentBucketStartAddress = destinationOffset;
-		//	System.out.println("here");
+			//	System.out.println("here");
 			/*
 			 * Iterate to empty bucket.
 			 * Assumption - all Buckets are filled to the max.
 			 */
 			Iterate:
-			while ((overflowBucketStartAddress = currentBucket.getOverflowOffset()) != -1){
-				overflowBucket = overflowBucket.readBucketFromFile(overFlowPath, overflowBucketStartAddress, dataType);
-			//	System.out.println("here!!");
-				if (overflowBucket.writeInfoToBucket(data, ptr)){
-					if (Config.DEBUG) System.out.println("Data entered to overflow bucket");
-					writtenToBucket = true;
-					overflowBucket.writeBucketToFile(overFlowPath, overflowBucketStartAddress, dataType);
-					if (Config.DEBUG) System.out.println("Inserted into pre-existing bucket " + overflowBucket);
-					
-					if(this.splitting == 0){
-						System.out.println("A split must occur.");
-							this.split();}
-					break Iterate;
+				while ((overflowBucketStartAddress = currentBucket.getOverflowOffset()) != -1){
+					overflowBucket = overflowBucket.readBucketFromFile(overFlowPath, overflowBucketStartAddress, dataType);
+					//	System.out.println("here!!");
+					if (overflowBucket.writeInfoToBucket(data, ptr)){
+						if (Config.DEBUG) System.out.println("Data entered to overflow bucket");
+						writtenToBucket = true;
+						overflowBucket.writeBucketToFile(overFlowPath, overflowBucketStartAddress, dataType);
+						if (Config.DEBUG) System.out.println("Inserted into pre-existing bucket " + overflowBucket);
+
+						if(this.splitting == 0){
+							System.out.println("A split must occur.");
+							this.split();
+						}
+						break Iterate;
+					}
+					currentBucket = overflowBucket;
+					//	System.out.println("STUCK");
+					currentBucketStartAddress = overflowBucketStartAddress;
 				}
-				currentBucket = overflowBucket;
-			//	System.out.println("STUCK");
-				currentBucketStartAddress = overflowBucketStartAddress;
-			}
-			
+
+			long newOverflowBucketStartAddress;
 			if (!writtenToBucket){
 				overflowBucket = new Bucket(numberOfEntriesInBucket, (long)-1);
 				overflowBucket.writeData();
 				overflowBucket.writeInfoToBucket(data, ptr);
 				File f = new File(overFlowPath);
-				long newOverflowBucketStartAddress = f.length();
+				if ( (newOverflowBucketStartAddress = this.oFile.getBucketFromFreeList()) == -1)
+					newOverflowBucketStartAddress = f.length();
 				overflowBucket.writeBucketToFile(overFlowPath, newOverflowBucketStartAddress, dataType);
 				if (Config.DEBUG) System.out.println("Inserted into new bucket " + overflowBucket);
-				
+
 				if (currentBucket == d){
 					currentBucket.setOverflowOffset(newOverflowBucketStartAddress);
-				    currentBucket.setNumberOfOverflowBuckets(currentBucket.getNumberOfOverflowBuckets()+1);
+					currentBucket.setNumberOfOverflowBuckets(currentBucket.getNumberOfOverflowBuckets()+1);
 					currentBucket.writeBucketToFile(path, currentBucketStartAddress, dataType);
 					System.out.println("A split must occur!");
 					if(this.splitting == 0){
 						System.out.println("A split must occur.");
-							this.split();}
+						this.split();}
 				}else{
 					d.setNumberOfOverflowBuckets(d.getNumberOfOverflowBuckets() +1);
 					d.writeBucketToFile(path, destinationOffset, dataType); 
@@ -226,14 +230,14 @@ public class IndexFile {
 					System.out.println("A split must occur!!");
 					if(this.splitting == 0){
 						System.out.println("A split must occur.");
-							this.split();}
+						this.split();}
 				}
 			}
 		}
 
 
 	}
-	
+
 	public Integer getHash(Object data){
 		/*
 		 * Compute the hash value of the data.
@@ -242,32 +246,32 @@ public class IndexFile {
 		// TODO divide hashcode with the appropriate
 		// function - so that the value lies within the correct 
 		// set of buckets.
-/**
+		/**
 		Integer b = data.hashCode() % this.numberOfBuckets;
 		if (b < this.nextPointer){
 			System.out.println("WEIRD!!!!!!!!");
 			b = data.hashCode() % (2*this.numberOfBuckets);
 		}
 		return b; 
-		**/
-	//	System.out.println(data.getClass());
+		 **/
+		//	System.out.println(data.getClass());
 
 		String str = "hey";
 		if(str.getClass() == data.getClass()){
-	//		System.out.println("STRING");
-		    str = data.toString();
+			//		System.out.println("STRING");
+			str = data.toString();
 			str = str.toLowerCase();
 			Integer b = Math.abs(str.hashCode()) % this.numberOfBuckets;
 			if(b < this.nextPointer)
 				b = Math.abs(str.hashCode()) % (2 * this.numberOfBuckets);
-		//	System.out.println(str + " !!! " + str.hashCode() + "  " + b);
+			//	System.out.println(str + " !!! " + str.hashCode() + "  " + b);
 			return b;
 		}
-		
+
 		Integer b = Math.abs(data.toString().hashCode()) % this.numberOfBuckets;
 		if(b < this.nextPointer)
 			b = Math.abs(data.toString().hashCode()) % (2 * this.numberOfBuckets);
-//		System.out.println(data + " !!! " + data.hashCode() + "  " + b);
+		//		System.out.println(data + " !!! " + data.hashCode() + "  " + b);
 		return b;
 	}
 
@@ -289,45 +293,47 @@ public class IndexFile {
 	}
 	public void split(){
 		this.splitting = 1;
-		
+
 		// increase number of buckets in index file
 		Bucket freshBucket = new Bucket(numberOfEntriesInBucket, (long) -1);
 		freshBucket.writeData();
 		freshBucket.writeBucketToFile(this.path, new File(this.path).length(), this.dataType);
-		
+
 		// set the offset for the current this.nextPointer bucket
 		long offsetSplit = this.headerLength + this.nextPointer * sizeOfBucket();
 		// create new bucket to copy that bucket
 		Bucket splitBucket = new Bucket(numberOfEntriesInBucket, (long) -1);
 		// copy that bucket to splitBucket
 		splitBucket = splitBucket.readBucketFromFile(this.path, offsetSplit, this.dataType);
-	//	System.out.println(" bucket to be split " + splitBucket.toString());
+		//	System.out.println(" bucket to be split " + splitBucket.toString());
 		int index = 0;
 		// arrayList to store objects of the bucket and its overflow bucket
 		ArrayList<Object> currentContents = new ArrayList<Object>();
-		
+
 		// get all data items from index bucket
 		while ( index < splitBucket.getCurrentSize()){
 			Object pluck = splitBucket.data[index][0];
 			Object ptr = splitBucket.data[index][1];
 			currentContents.add(pluck);
 			currentContents.add(ptr);
-		//	System.out.println(pluck);
+			//	System.out.println(pluck);
 			index++;
-			
+
 		}
-		 
-	
+
+
 		// get al
-		
+
 		int overFlowBucket1 = 0;
-	//	System.out.println("OVERFLOWWWWSS" + splitBucket.getNumberOfOverflowBuckets());
+		int x = splitBucket.getNumberOfOverflowBuckets();
+		long offsetOfBucketToBeAddedToFreeList = 0;
+		//	System.out.println("OVERFLOWWWWSS" + splitBucket.getNumberOfOverflowBuckets());
 		// traverse each overflow bucket
 		while(overFlowBucket1 < splitBucket.getNumberOfOverflowBuckets()){
 			System.out.println("enter");
 			Bucket overflowBucket = splitBucket.readBucketFromFile(this.overFlowPath, splitBucket.getOverflowOffset() - overFlowBucket1 * sizeOfBucket(), this.dataType);
 
-		
+
 			index = 0;
 
 			// add all elements from the overflow bucket
@@ -339,10 +345,13 @@ public class IndexFile {
 				System.out.println("Overflow item " + pluck);
 				index++;
 			}
-		
+
 			// reset this overflow bucket
+			offsetOfBucketToBeAddedToFreeList = splitBucket.getOverflowOffset();
 			splitBucket.resetBucket(this.overFlowPath, splitBucket.getOverflowOffset() - overFlowBucket1 * sizeOfBucket(), this.dataType);
-			splitBucket.freeBuckets.add(overflowBucket);
+			Bucket.freeBuckets.add(overflowBucket);
+			this.oFile.addBucketToFreeList(offsetOfBucketToBeAddedToFreeList);
+			this.oFile.writeHeaderInformationToFile();
 			overFlowBucket1++;
 		}
 		// all contents of bucket to be split and its overflow buckets now in currentContents
@@ -360,17 +369,17 @@ public class IndexFile {
 			this.writeToIndexFile(data, Long.parseLong(ptr.toString()));
 			index = index + 2;	
 		}
-		
-		
-		
+
+
+
 		if(this.nextPointer == this.numberOfBuckets * (this.round + 1) - 1){
 			this.nextPointer = 0;
 			this.numberOfBuckets *= 2;
 			this.round++;
-			
+
 		}
 		this.writeHeaderInformationToFile();
-	this.splitting = 0;
+		this.splitting = 0;
 	}
 
 
@@ -415,9 +424,9 @@ public class IndexFile {
 		System.out.println(bucketToBeSearched + " search bucket");
 		System.out.println(value + " value");
 		Long bucketToBeSearchedOffset = this.headerLength + (long) ((bucketToBeSearched)*sizeOfBucket());
-		
+
 		ArrayList<Long> retValues = new ArrayList<Long>();
-		
+
 		Bucket search = new Bucket(numberOfEntriesInBucket, (long)-1);
 		search = search.readBucketFromFile(path, bucketToBeSearchedOffset, dataType);
 		if(search == null){
@@ -428,9 +437,9 @@ public class IndexFile {
 			for (int i = 0 ; i <search.getCurrentSize() ; i++){
 				// for each bucket - read all the data values.
 				System.out.println("foudn value " + search.data[i][0]);
-		//		System.out.println(search.data[i][0].getClass());
+				//		System.out.println(search.data[i][0].getClass());
 				if (search.data[i][0].toString().toLowerCase().equals(value.toString().toLowerCase())){
-				
+
 					// If value in the data array matches 
 					// the value that we are searching 
 					// add the RID to the list.
@@ -440,14 +449,14 @@ public class IndexFile {
 			// Read the next Overflow bucket into memory
 			search = search.readBucketFromFile(overFlowPath, search.getOverflowOffset(), dataType);
 		}while (search != null);
-		
-		
+
+
 		return retValues;
 	}
-	
 
-	}
-	
-	
+
+}
+
+
 
 
