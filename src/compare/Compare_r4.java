@@ -130,6 +130,12 @@ public class Compare_r4 implements Compare {
 		return val;
 	}
 
+	@Override
+	public Object readObjectAtOffset(RandomAccessFile raf, long offset,
+			int length) {
+		return Helper.toFloat(readAtOffset(raf, offset, length));
+	}
+
 	
 
 }

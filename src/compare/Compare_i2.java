@@ -120,6 +120,12 @@ public class Compare_i2 implements Compare {
 		return val;
 	}
 
+	@Override
+	public Object readObjectAtOffset(RandomAccessFile raf, long offset,
+			int length) {
+		return Helper.toInt2(readAtOffset(raf, offset, length));
+	}
+
 	
 
 }

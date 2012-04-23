@@ -121,13 +121,13 @@ public class Bucket {
 
 			for (int i = 0; i< this.maxSize ; i++){
 				if(datatype.contains("c")){
-					temp.data[i][0] = comparer.compare_functions[6].readStringAtOffset(raf, (int) tempOffset, Integer.parseInt(datatype.substring(1)));
+					temp.data[i][0] = comparer.compare_functions[6].readObjectAtOffset(raf, (int) tempOffset, Integer.parseInt(datatype.substring(1)));
 				}
 				else
-					temp.data[i][0] = comparer.compare_functions[comparer.mapper.indexOf(datatype)].readStringAtOffset(raf, (int) tempOffset, Integer.parseInt(datatype.substring(1)));
+					temp.data[i][0] = comparer.compare_functions[comparer.mapper.indexOf(datatype)].readObjectAtOffset(raf, (int) tempOffset, Integer.parseInt(datatype.substring(1)));
 				tempOffset += Integer.parseInt(datatype.substring(1));
 
-				temp.data[i][1] = comparer.compare_functions[3].readStringAtOffset(raf, (int) tempOffset, 8);
+				temp.data[i][1] = comparer.compare_functions[3].readObjectAtOffset(raf, (int) tempOffset, 8);
 				tempOffset += 8;
 			}
 			raf.close();

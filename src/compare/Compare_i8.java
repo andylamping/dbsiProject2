@@ -116,6 +116,12 @@ public class Compare_i8 implements Compare {
 		return val;
 	}
 
+	@Override
+	public Object readObjectAtOffset(RandomAccessFile raf, long offset,
+			int length) {
+		return Helper.toLong(readAtOffset(raf, offset, length));
+	}
+
 	
 
 }

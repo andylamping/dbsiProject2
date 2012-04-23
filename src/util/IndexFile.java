@@ -212,6 +212,7 @@ public class IndexFile {
 					newOverflowBucketStartAddress = f.length();
 				}
 
+				overflowBucket = overflowBucket.readBucketFromFile(overFlowPath, newOverflowBucketStartAddress, dataType);
 				overflowBucket.writeData();
 				overflowBucket.writeInfoToBucket(data, ptr);
 				

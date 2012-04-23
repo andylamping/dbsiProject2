@@ -20,5 +20,7 @@ public long writeAtOffset(RandomAccessFile raf,long offset, String data, int len
 
 public String readStringAtOffset(RandomAccessFile raf, long offset, int length);
 
+public Object readObjectAtOffset(RandomAccessFile raf, long offset, int length);
+
 public byte[] readAtOffset (RandomAccessFile raf,long offset, int length);
 }

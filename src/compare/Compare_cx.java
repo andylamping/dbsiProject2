@@ -144,6 +144,12 @@ public class Compare_cx implements Compare {
 		return val;
 	}
 
+	@Override
+	public Object readObjectAtOffset(RandomAccessFile raf, long offset,
+			int length) {
+		return readStringAtOffset(raf, offset, length);
+	}
+
 	
 
 }
