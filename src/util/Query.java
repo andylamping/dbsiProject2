@@ -527,7 +527,7 @@ public void writeSelectedDataAfterProjectionsOnRID (ArrayList<Long> matchingReco
     f1.delete();
     CSVFile csvTarget = new CSVFile("example_output.acsv");
 
-    schema = projectData(this.heapFile.schema);
+    schema = projectData(this.heapFile.schema)+"\n";
     csvTarget.writeDataToFile(schema);
 
     for (Long RID:matchingRecords){
@@ -547,14 +547,14 @@ public void writeSelectedDataAfterProjectionsOnRecord ( ArrayList<Integer> match
     f1.delete();
     CSVFile csvTarget = new CSVFile("example_output.acsv");
 
-    schema = projectData(this.heapFile.schema);
+    schema = projectData(this.heapFile.schema)+"\n";
     csvTarget.writeDataToFile(schema);
 
     for (Integer i:matchingRecords){
             RID = heapFile.currentFileOffset + (i*heapFile.numberOfBytesPerRecord);
             currentRecord = heapFile.getRecordByRIDFromHeapFile(RID);
             //project data
-            currentRecord = projectData(currentRecord);
+            currentRecord = projectData(currentRecord)+"\n";
 
             //Write the Record to CSV File
             csvTarget.writeDataToFile(currentRecord);

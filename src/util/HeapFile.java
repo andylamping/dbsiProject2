@@ -679,4 +679,14 @@ public class HeapFile extends MyFile{
 		System.out.println("NP " + iFile.nextPointer);
 		return iFile.getListOfRIDsForColumnValue(value);
 	}
+
+
+	public int getHasNewRecords() {
+		return hasNewRecords;
+	}
+
+
+	public void setHasNewRecords(int hasNewRecords) {
+		this.hasNewRecords = hasNewRecords;
+	}
 }
