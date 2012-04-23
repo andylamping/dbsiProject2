@@ -321,10 +321,11 @@ public class IndexFile {
 		// get al
 		
 		int overFlowBucket1 = 0;
+		int x = splitBucket.getNumberOfOverflowBuckets();
 	//	System.out.println("OVERFLOWWWWSS" + splitBucket.getNumberOfOverflowBuckets());
 		// traverse each overflow bucket
-		while(overFlowBucket1 < splitBucket.getNumberOfOverflowBuckets()){
-			System.out.println("enter");
+		while(overFlowBucket1 < x){
+			System.out.println("enter" + splitBucket.getNumberOfOverflowBuckets());
 			Bucket overflowBucket = splitBucket.readBucketFromFile(this.overFlowPath, splitBucket.getOverflowOffset() - overFlowBucket1 * sizeOfBucket(), this.dataType);
 
 		
@@ -341,16 +342,22 @@ public class IndexFile {
 			}
 		
 			// reset this overflow bucket
-			splitBucket.resetBucket(this.overFlowPath, splitBucket.getOverflowOffset() - overFlowBucket1 * sizeOfBucket(), this.dataType);
-			splitBucket.freeBuckets.add(overflowBucket);
+		
 			overFlowBucket1++;
 		}
+		
+		overFlowBucket1 = 0;
+		while (overFlowBucket1 < x){
+			splitBucket.resetBucket(this.overFlowPath, splitBucket.getOverflowOffset() - overFlowBucket1 * sizeOfBucket(), this.dataType);
+			overFlowBucket1++;
+		}
+
 		// all contents of bucket to be split and its overflow buckets now in currentContents
 		splitBucket.resetBucket(this.path, this.headerLength + (long) this.nextPointer * sizeOfBucket(), this.dataType);
 		index = 0;
-		System.out.println("Rehashing bucket");
+		System.out.println("Rehashing bucket" + this.nextPointer);
 		this.nextPointer++;
-		System.out.println(this.nextPointer);
+	//	System.out.println(this.nextPointer);
 		while(index < currentContents.size()){
 			System.out.println("Overflow!" + index);
 			Object data = currentContents.get(index);
@@ -364,6 +371,7 @@ public class IndexFile {
 		
 		
 		if(this.nextPointer == this.numberOfBuckets * (this.round + 1) - 1){
+		//	System.out.println("********************");
 			this.nextPointer = 0;
 			this.numberOfBuckets *= 2;
 			this.round++;
@@ -438,6 +446,7 @@ public class IndexFile {
 				}
 			}
 			// Read the next Overflow bucket into memory
+			System.out.println(search);
 			search = search.readBucketFromFile(overFlowPath, search.getOverflowOffset(), dataType);
 		}while (search != null);
 		
