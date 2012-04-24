@@ -65,7 +65,7 @@ public class OverflowFile {
 	public long getBucketFromFreeList (){
 		getHeaderInformationFromFile();
 		if (this.freeBucketList == -1){
-			if (Config.DEBUG) System.out.println("No Free Bucket");
+	//		if (Config.DEBUG) System.out.println("No Free Bucket");
 			return -1;
 		}
 		else {
@@ -86,7 +86,7 @@ public class OverflowFile {
 		b.setOverflowOffset(this.freeBucketList);
 		this.freeBucketList = ptr;
 		this.writeHeaderInformationToFile();
-		if (Config.DEBUG) System.out.println("Bucket added to FreeList");
+//		if (Config.DEBUG) System.out.println("Bucket added to FreeList");
 	}
 
 	/* Getter and Setters */
