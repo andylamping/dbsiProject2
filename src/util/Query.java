@@ -34,10 +34,10 @@ public class Query {
 		int hasQuery = this.hasQuery();
 		// if not, program terminates
 		if(hasQuery == 0){
-			System.out.println("no query");
+	//		System.out.println("no query");
 			return;
 		}
-		System.out.println("there is a query");
+	//	System.out.println("there is a query");
 		this.dummyRecord = new ArrayList<ArrayList<Condition>>();
 		this.projectionList = new ArrayList<String>();
 		this.argIndex = 1;
@@ -105,7 +105,7 @@ public class Query {
 			// if argument contains an s, then we create a new condition,
 			//and advance 3 spots in the index
 			if(this.args[this.argIndex].contains("s")){
-				System.out.println("there is a selection");
+	//			System.out.println("there is a selection");
 				argCount++;
 				conditionList.add(this.args[this.argIndex]);
 				int columnNumber = Integer.parseInt(this.args[this.argIndex].substring(2));
@@ -142,7 +142,7 @@ public class Query {
 					dummyRecord.add(added);
 					dummyRecord.get(dummyRecord.size() - 1).add(condition);
 					this.argIndex = this.argIndex + 3;
-					System.out.println("added condition on new column");
+			//		System.out.println("added condition on new column");
 
 				}
 			}
@@ -169,7 +169,7 @@ public class Query {
 			}
 			this.argIndex++;
 		}
-		System.out.println("there are " + this.projectionList.size() + " projections");
+//		System.out.println("there are " + this.projectionList.size() + " projections");
 	}
 
 	public void findMatchingRecords() {
@@ -188,12 +188,12 @@ public class Query {
 		int hashes = 0;
 		int x = 0;
 		int advance = 1;
-		System.out.println("dummy records has " + this.dummyRecord.size() + " size");
+	//	System.out.println("dummy records has " + this.dummyRecord.size() + " size");
 		while(x < this.dummyRecord.size()){
 			// get column of this condition list
 			int y = 0;
 			int column = this.dummyRecord.get(x).get(y).column;
-			System.out.println("there is a condition on column " + column);
+		//	System.out.println("there is a condition on column " + column);
 			// check if there is a hash index on this column
 			if(this.heapFile.indexExistsOnColumn(column)){
 
@@ -201,12 +201,12 @@ public class Query {
 					// if current condition's parameter is equality, then we get the RIDs for the value
 					String param = this.dummyRecord.get(x).get(y).operator;
 					if(param.equals("=")){
-						System.out.println("hash increase");
+				//		System.out.println("hash increase");
 						// increase hashes
 						hashes++;
 						// get RID
 						ArrayList<Long> equalityRIDs = this.heapFile.getListOfRidsForSelectionCondition(column, this.dummyRecord.get(x).get(y).value);
-						System.out.println(equalityRIDs.size() + "returned RIDs size!!");
+					//	System.out.println(equalityRIDs.size() + "returned RIDs size!!");
 						// add RIDs to list
 						int a = 0;
 						while(a < equalityRIDs.size()){
@@ -234,13 +234,13 @@ public class Query {
 		// if 'hashes' > 1, then we can reduce the RID set by only keeping an RID
 		// if it appears in the list 'hashes' amount of time
 		if(hashes > 0){
-			System.out.println("hashes > 0");
+		//	System.out.println("hashes > 0");
 			if(hashes > 1){
-				System.out.println("hashes > 1");
+			//	System.out.println("hashes > 1");
 				ArrayList<Long> matchRIDs = new ArrayList<Long>();
 				int e = 0;
-				int matchesNeeded = hashes;
-
+				int matchesNeeded = hashes - 1;
+			//	System.out.println(matchesNeeded);
 				while(e < allRIDs.size()){
 					int f = e + 1;
 					int matched = 0;
@@ -252,6 +252,7 @@ public class Query {
 						if(matches == matchesNeeded){
 							matchRIDs.add(allRIDs.get(e));
 							matched = 1;
+						//	System.out.println("MATCH");
 						}
 
 						f++;
@@ -355,8 +356,8 @@ public class Query {
 		}
 
 		else if (hashes == 0){
-			System.out.println("no hashes");
-			System.out.println("dummy rec size is " + this.dummyRecord.size());
+		//	System.out.println("no hashes");
+		//	System.out.println("dummy rec size is " + this.dummyRecord.size());
 
 			// end of try
 			// if allRIDs.size() == 0 that must mean that we didnt have an index on any of the
@@ -421,7 +422,7 @@ public class Query {
 						if(reject == 0){
 							// match found, add to matchRecords list
 							this.matchingRecords.add(currentRecord);
-							System.out.println("match found in no hashes");
+				//			System.out.println("match found in no hashes");
 						}
 
 						currentRecord++;
@@ -439,7 +440,7 @@ public class Query {
 				} // end of catchers
 				m++;
 			} // end of m > 0 loop
-			System.out.println("done scanning records");
+			//System.out.println("done scanning records");
 			m = this.dummyRecord.size();
 			ArrayList<Integer> matchRecs = new ArrayList<Integer>();
 			int e = 0;
@@ -457,7 +458,7 @@ public class Query {
 						matches++;
 					}
 					if(matches == matchesNeeded){
-						System.out.println("found real match");
+				//		System.out.println("found real match");
 						matchRecs.add(this.matchingRecords.get(e));
 						matched = 1;
 					}
@@ -482,7 +483,7 @@ public class Query {
 		for (String s:this.projectionList){
 			projections.add(Integer.parseInt(s.substring(2)) - 1);
 		}
-		System.out.println("projections size in CPA is " + projections.size());
+	//	System.out.println("projections size in CPA is " + projections.size());
 		return projections;
 	}
 
@@ -518,7 +519,7 @@ public class Query {
 		if (projectionList.size() != 0){
 			String []dataElements = data.split(",");
 			data = "";
-			System.out.println(projections.size());
+	//		System.out.println(projections.size());
 			for (Integer j : projections){
 				data += dataElements[j]+",";
 				j++;
@@ -569,6 +570,7 @@ public class Query {
 				currentRecord = projectData(currentRecord)+"\n";
 
 				//Write the Record to CSV File
+				
 				csvTarget.writeDataToFile(currentRecord);
 			}
 		}
