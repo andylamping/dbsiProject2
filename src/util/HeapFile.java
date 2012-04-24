@@ -73,7 +73,7 @@ public class HeapFile extends MyFile{
 				i++;
 			}
 			this.writeHeaderInformationToFile();
-			System.out.println("heap file " + this.path +  " created");
+	//		System.out.println("heap file " + this.path +  " created");
 
 		}
 	}
@@ -83,7 +83,7 @@ public class HeapFile extends MyFile{
 		/*
 		 * Write the header information to 
 		 * the file, 
-		 * Number of Records, Number of Fields, No. of Bytes in Schema
+		 * Number Records, Number of Fields, No. of Bytes in Schema
 		 * Schema, No. of Bytes in Index Data, Index Data.
 		 */
 
@@ -114,7 +114,7 @@ public class HeapFile extends MyFile{
 				raf.write(Helper.toByta(indexData[i]));
 			}
 			this.currentFileOffset = raf.getFilePointer();
-			System.out.println(this.currentFileOffset);
+	//		System.out.println(this.currentFileOffset);
 			raf.close();
 
 		} catch (FileNotFoundException e) {
@@ -166,11 +166,11 @@ public class HeapFile extends MyFile{
 
 				raf.read(b, 0, 4);
 				this.indexData[i] = Helper.toInt(b);
-				System.out.println("Index " + i + "in indexData is " + Helper.toInt(b));
+		//		System.out.println("Index " + i + "in indexData is " + Helper.toInt(b));
 			}
 			// Offset after Header information has been read.
 			this.offsetEndOfHeader = this.currentFileOffset = raf.getFilePointer();
-			System.out.println(this.offsetEndOfHeader + " EOF");
+		//	System.out.println(this.offsetEndOfHeader + " EOF");
 			raf.close();
 
 			headerRead = true;
@@ -202,7 +202,7 @@ public class HeapFile extends MyFile{
 		try {
 			raf = new RandomAccessFile(new File(this.path), "rw");
 			raf.seek(this.offsetIndexData);
-			System.out.println(this.offsetIndexData);
+		//	System.out.println(this.offsetIndexData);
 			//	System.out.println("rewrote indexdata in heap");
 			raf.write(Helper.toByta(indexData));
 			//System.out.print(raf.getFilePointer() + "FP");
@@ -236,7 +236,7 @@ public class HeapFile extends MyFile{
 				if (count == 0){
 					this.schema = currentRecord;
 				}else{
-					System.out.print(count + " " );
+				//	System.out.print(count + " " );
 					currentRID = writeRecordAsByteToHeapFileUsingRAF(raf,currentRecord);
 				}
 				count++;
@@ -253,7 +253,7 @@ public class HeapFile extends MyFile{
 						if (data == null){
 							if (Config.DEBUG) System.out.println("Data reading problem");
 						}
-						System.out.println("Inserting" + data);
+				//		System.out.println("Inserting" + data);
 						iFile.writeToIndexFile(data, currentRID);
 
 					}
@@ -289,7 +289,7 @@ public class HeapFile extends MyFile{
 			comparer.compare_functions[schemaArray[j]].write(path, currentFileOffset, s[j], lengthArray[j]);
 			this.currentFileOffset += lengthArray[j];
 		}
-		if (Config.DEBUG) System.out.println("Record written to the file");
+	//	if (Config.DEBUG) System.out.println("Record written to the file");
 
 		return startOffsetForRecord;
 	}
@@ -304,7 +304,7 @@ public class HeapFile extends MyFile{
 				comparer.compare_functions[schemaArray[j]].writeAtOffset(raf, currentFileOffset, s[j], lengthArray[j]);
 				this.currentFileOffset += lengthArray[j];
 			}
-			if (Config.DEBUG) System.out.println("Record written to the file");
+	//		if (Config.DEBUG) System.out.println("Record written to the file");
 
 			return startOffsetForRecord;
 		} catch (IOException e) {
@@ -398,7 +398,7 @@ public class HeapFile extends MyFile{
 				result += comparer.compare_functions[schemaArray[i]].readStringAtOffset(raf,(int) position, this.lengthArray[i]) + ",";
 				position += val.length;
 			}
-			System.out.println(result);
+		//	System.out.println(result);
 			result = result.substring(0, result.length()-1)+"\n";
 			raf.close();
 			return result;
@@ -416,9 +416,9 @@ public class HeapFile extends MyFile{
 			byte[] val;
 			Comparer comparer = new Comparer();
 			this.getHeaderInformationFromFile();
-			System.out.println(this.currentFileOffset + "OF");
+		//	System.out.println(this.currentFileOffset + "OF");
 			long position = RID;
-			System.out.println(RID + "RID");
+		//	System.out.println(RID + "RID");
 			for(int i = 0; i<this.schemaArray.length; i++){
 				val = comparer.compare_functions[schemaArray[i]].readAtOffset(raf,(int) position, this.lengthArray[i]);
 				result += comparer.compare_functions[schemaArray[i]].readStringAtOffset(raf,(int) position, this.lengthArray[i]) + ",";
@@ -426,7 +426,7 @@ public class HeapFile extends MyFile{
 			}
 
 			result = result.substring(0, result.length()-1)+"\n";
-			System.out.println(result + "record!");
+		//	System.out.println(result + "record!");
 			raf.close();
 			return result;
 		}catch (Exception e){
@@ -546,7 +546,7 @@ public class HeapFile extends MyFile{
 		long currentRecordPointer = this.currentFileOffset;
 		for (int i= 0 ;i < this.numberOfRecords; i++){
 			currentRecord = this.getRecordFromHeapFile();
-			System.out.println("Current record is" + currentRecord);
+		//	System.out.println("Current record is" + currentRecord);
 			data = getAppropriateData(currentRecord, columnNumber,dataType);
 
 			if (data == null){
@@ -623,7 +623,7 @@ public class HeapFile extends MyFile{
 
 	private void setIndexOnColumn(Integer columnNumber) {
 		this.indexData[columnNumber - 1] = 1;
-		System.out.println("index on column number " + columnNumber + " set to 1");
+	//	System.out.println("index on column number " + columnNumber + " set to 1");
 	}
 
 
@@ -633,12 +633,12 @@ public class HeapFile extends MyFile{
 	 */
 
 	public boolean indexExistsOnColumn(Integer columnNumber) {
-		System.out.println("Checking to see if index exists.");
-		if(this.indexData[columnNumber-1] == 1){
-			System.out.println("It does");
-		}
-		else
-			System.out.println("It doesnt");
+	//	System.out.println("Checking to see if index exists.");
+//		if(this.indexData[columnNumber-1] == 1){
+	//		System.out.println("It does");
+	//	}
+	//	else
+		//	System.out.println("It doesnt");
 		return (this.indexData[columnNumber-1] == 1);
 	}
 
@@ -657,7 +657,7 @@ public class HeapFile extends MyFile{
 		IndexFile iFile = new IndexFile(path+ "." +columnNumber+".lht", path+"."+columnNumber+".lho", dataType);
 		//System.out.println(columnNumber);
 		iFile.getHeaderInformationFromFile();
-		System.out.println("NP " + iFile.nextPointer);
+	//	System.out.println("NP " + iFile.nextPointer);
 		return iFile.getListOfRIDsForColumnValue(value);
 	}
 
