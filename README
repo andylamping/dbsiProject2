@@ -1,0 +1,33 @@
+This Program has the ability to insert/append records to a heap file (saved to disk), as well as build/rebuild hash indexes on each column of the heap file. If an index exists and records are appended to the heap, the column with the index automatically hashes the records.
+
+================
+
+
+
+
+To compile the program on Linux machine
+
+cd /src/
+javac */*.java
+
+To run the code - please enclose all special operators within " " quotes.
+
+eg.
+java Tester/Test heapFile.hf -i "<" example.acsv
+
+java Tester/Test heapFile.hf -b1 -b2
+
+java Tester/Test heapFile.hf -s1 "=" 1
+
+java Tester/Test heapFile.hf -s3 ">" 4
+
+
+To display the output onto a file 
+/*
+  This will paste the output to the file example_output.acsv
+*/
+
+java Tester/Test heapFile.hf > example_output.acsv 
+
+
+The number of records in each Bucket is kept at 4.
