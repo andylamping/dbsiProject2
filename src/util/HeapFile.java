@@ -226,6 +226,7 @@ public class HeapFile extends MyFile{
 		String currentRecord = null ;
 
 		int count  = 0;
+		long currentRID = 0;
 		try {
 			RandomAccessFile raf = new RandomAccessFile(new File(path), "rw");
 
@@ -236,7 +237,7 @@ public class HeapFile extends MyFile{
 					this.schema = currentRecord;
 				}else{
 					System.out.print(count + " " );
-					writeRecordAsByteToHeapFileUsingRAF(raf,currentRecord);
+					currentRID = writeRecordAsByteToHeapFileUsingRAF(raf,currentRecord);
 				}
 				count++;
 				int i = 0;
@@ -253,7 +254,7 @@ public class HeapFile extends MyFile{
 							if (Config.DEBUG) System.out.println("Data reading problem");
 						}
 						System.out.println("Inserting" + data);
-						iFile.writeToIndexFile(data, this.currentFileOffset);
+						iFile.writeToIndexFile(data, currentRID);
 
 					}
 					i++;
