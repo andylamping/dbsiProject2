@@ -29,8 +29,9 @@ public class CSVFile extends MyFile{
 			int count = 0;
 			// Write the schema to the file
 			bw.write(hfile.schema);
+			System.out.println(hfile.schema);
 			bw.newLine();
-			if (Config.DEBUG) System.out.println(hfile.schema);
+	//		if (Config.DEBUG) System.out.println(hfile.schema);
 
 			//	Fetch first record from the heap file.
 			String currentRecord = hfile.getRecordFromHeapFile();
@@ -38,13 +39,14 @@ public class CSVFile extends MyFile{
 
 			for (int i=0 ;i<hfile.numberOfRecords;i++){
 				bw.write(currentRecord);
+				System.out.println(currentRecord);
 				bw.newLine();
 				//	Fetch subsequent records from the heap file.
 				currentRecord = hfile.getRecordFromHeapFile();
 				count++;
 			}
 			bw.close();
-			if (Config.DEBUG) System.out.println(count + " Records written to file.");
+		//	if (Config.DEBUG) System.out.println(count + " Records written to file.");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -72,6 +74,8 @@ public class CSVFile extends MyFile{
 		try {
 			bw = new BufferedWriter(new FileWriter(path, true));
 			bw.write(string);
+	
+			System.out.print(string);
 			bw.newLine();
 			bw.close();
 
