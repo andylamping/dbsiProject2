@@ -400,6 +400,7 @@ public class IndexFile {
 		// all contents of bucket to be split and its overflow buckets now in currentContents
 		splitBucket.resetBucket(this.path, this.headerLength + (long) this.nextPointer * sizeOfBucket(), this.dataType);
 		index = 0;
+		System.out.println("THIS ROUND IS" + this.round);
 		System.out.println("Rehashing bucket ---- NEXT POINTER IS " + this.nextPointer);
 		this.nextPointer++;
 		if (Config.DEBUG) System.out.println("NEXT POINTER HAS BEEN INCREMENTED");
@@ -416,16 +417,18 @@ public class IndexFile {
 		}
 
 
-
-		if(this.nextPointer == this.numberOfBuckets * (this.round + 1)){
+		//System.out.println("THIS ROUND IS" + this.round);
+		System.out.println("NP = " + this.nextPointer + ". NB = " + this.numberOfBuckets + ". R = " + this.round);
+		if(this.nextPointer == this.numberOfBuckets * (this.round)){
 			System.out.println("******************** " + this.nextPointer );
 			this.nextPointer = 0;
-			this.numberOfBuckets = 2 * this.numberOfBuckets;
+		//	this.numberOfBuckets = 2 * this.numberOfBuckets;
 			System.out.println("num buck " + this.numberOfBuckets);
 			System.out.println(this.numberOfBuckets * (this.round + 1) - 1 + "aaaaa");
+			
 			this.round++;
-
 		}
+		
 		this.writeHeaderInformationToFile();
 		this.splitting = 0;
 	}
