@@ -64,7 +64,7 @@ public class IndexFile {
 		 * Column Length -	depends on the value - 	length 4 bytes (since we store Integer value)
 		 * next Pointer  -	depends on the value - 	length 4 bytes (since we store Integer value)
 		 */
-		System.out.println("Writing headerinformation to index file");
+	//s	System.out.println("Writing headerinformation to index file");
 		File f = new File(this.path);
 		try {
 			RandomAccessFile raf = new RandomAccessFile(f, "rw");
@@ -74,7 +74,7 @@ public class IndexFile {
 			this.offsetColumnLength = this.currentFileOffset = raf.getFilePointer();
 			raf.write(Helper.toByta(this.columnLength));
 
-			System.out.println("writing pointer!!" + this.nextPointer);
+		//	System.out.println("writing pointer!!" + this.nextPointer);
 			this.offsetNextPtr = this.currentFileOffset = raf.getFilePointer();
 			raf.write(Helper.toByta(this.nextPointer));
 
@@ -146,7 +146,7 @@ public class IndexFile {
 	 */
 	public void writeToIndexFile(Object data, long ptr){
 		Integer destinationBucketNumber = this.getHash( data);
-		System.out.println("Inserting " + data + " into bucket:" + destinationBucketNumber + "at ptr " + ptr);
+	//f	System.out.println("Inserting " + data + " into bucket:" + destinationBucketNumber + "at ptr " + ptr);
 		insertIntoDestinationBucket(destinationBucketNumber, data, ptr);
 	}
 
@@ -172,14 +172,14 @@ public class IndexFile {
 		boolean writtenToBucket = false;
 		boolean reuse = false;
 		if (d.writeInfoToBucket(data, ptr)){
-			if (Config.DEBUG) System.out.println("Successfully entered into the same bucket");
+//			if (Config.DEBUG) System.out.println("Successfully entered into the same bucket");
 			writtenToBucket = true;
-			System.out.println(destinationBucketNumber + "  " + d);	
+		//	System.out.println(destinationBucketNumber + "  " + d);	
 			d.writeBucketToFile(path, destinationOffset, dataType);
 		}
 		else {
-			System.out.println(d);
-			if (Config.DEBUG) System.out.println("Overflow has occured!!!");
+	//		System.out.println(d);
+		//	if (Config.DEBUG) System.out.println("Overflow has occured!!!");
 			Bucket currentBucket = d;
 			Bucket overflowBucket= new Bucket(numberOfEntriesInBucket, (long)-1) ;
 			long currentBucketStartAddress = destinationOffset;
@@ -193,18 +193,18 @@ public class IndexFile {
 					overflowBucket = overflowBucket.readBucketFromFile(overFlowPath, overflowBucketStartAddress, dataType);
 					//	System.out.println("here!!");
 					if (overflowBucket.writeInfoToBucket(data, ptr)){
-						if (Config.DEBUG) System.out.println("Data entered to overflow bucket");
+		//				if (Config.DEBUG) System.out.println("Data entered to overflow bucket");
 						writtenToBucket = true;
 						overflowBucket.writeBucketToFile(overFlowPath, overflowBucketStartAddress, dataType);
-						if (Config.DEBUG) System.out.println("Inserted into pre-existing bucket " + overflowBucket);
+	//					if (Config.DEBUG) System.out.println("Inserted into pre-existing bucket " + overflowBucket);
 
 						if(this.splitting == 0){
-							System.out.println("A split must occur.");
+			//				System.out.println("A split must occur.");
 							this.split();}
 						break Iterate;
 					}
 					currentBucket = overflowBucket;
-					System.out.println("STUCK");
+			//		System.out.println("STUCK");
 					currentBucketStartAddress = overflowBucketStartAddress;
 				}
 
@@ -228,24 +228,24 @@ public class IndexFile {
 				overflowBucket.writeInfoToBucket(data, ptr);
 
 				overflowBucket.writeBucketToFile(overFlowPath, newOverflowBucketStartAddress, dataType);
-				if (Config.DEBUG) System.out.println("Inserted into new bucket " + overflowBucket);
+	//			if (Config.DEBUG) System.out.println("Inserted into new bucket " + overflowBucket);
 
 				if (currentBucket == d){
 					currentBucket.setOverflowOffset(newOverflowBucketStartAddress);
 					currentBucket.setNumberOfOverflowBuckets(currentBucket.getNumberOfOverflowBuckets()+1);
 					currentBucket.writeBucketToFile(path, currentBucketStartAddress, dataType);
-					System.out.println("A split must occur!");
+			//		System.out.println("A split must occur!");
 					if(this.splitting == 0){
-						System.out.println("A split must occur.");
+			//			System.out.println("A split must occur.");
 						this.split();}
 				}else{
 					d.setNumberOfOverflowBuckets(d.getNumberOfOverflowBuckets() +1);
 					d.writeBucketToFile(path, destinationOffset, dataType); 
 					currentBucket.setOverflowOffset(newOverflowBucketStartAddress);
 					currentBucket.writeBucketToFile(overFlowPath, currentBucketStartAddress, dataType);
-					System.out.println("A split must occur!!");
+				//	System.out.println("A split must occur!!");
 					if(this.splitting == 0){
-						System.out.println("A split must occur.");
+				//		System.out.println("A split must occur.");
 						this.split();}
 				}
 			}
@@ -300,7 +300,7 @@ public class IndexFile {
 		Bucket initial ;
 		this.oFile.dataType = this.dataType;
 		long offsetForNewBucket = this.currentFileOffset;
-		System.out.println(this.dataType);
+	//	System.out.println(this.dataType);
 		for (int i = 0; i< this.numberOfBuckets; i++){
 			initial = new Bucket(numberOfEntriesInBucket, (long)-1);
 			initial.writeData();
@@ -388,7 +388,7 @@ public class IndexFile {
 				Object ptr = overFlowBucket.data[index][1];
 				currentContents.add(pluck);
 				currentContents.add(ptr);
-				if(Config.DEBUG) System.out.println("Overflow item " + pluck);
+	//			if(Config.DEBUG) System.out.println("Overflow item " + pluck);
 				index++;
 			}
 			newOverFlowBucketOffsetAddress = overFlowBucketOffsetAddress;
@@ -400,31 +400,31 @@ public class IndexFile {
 		// all contents of bucket to be split and its overflow buckets now in currentContents
 		splitBucket.resetBucket(this.path, this.headerLength + (long) this.nextPointer * sizeOfBucket(), this.dataType);
 		index = 0;
-		System.out.println("THIS ROUND IS" + this.round);
-		System.out.println("Rehashing bucket ---- NEXT POINTER IS " + this.nextPointer);
+//		System.out.println("THIS ROUND IS" + this.round);
+	//	System.out.println("Rehashing bucket ---- NEXT POINTER IS " + this.nextPointer);
 		this.nextPointer++;
-		if (Config.DEBUG) System.out.println("NEXT POINTER HAS BEEN INCREMENTED");
+	//	if (Config.DEBUG) System.out.println("NEXT POINTER HAS BEEN INCREMENTED");
 		this.writeHeaderInformationToFile();
 		//	System.out.println(this.nextPointer);
 		while(index < currentContents.size()){
-			System.out.println("Overflow!" + index);
+	//		System.out.println("Overflow!" + index);
 			Object data = currentContents.get(index);
 			Object ptr = currentContents.get(index + 1);
 			int hash = getHash(data);
-			System.out.println("New hash " + hash);
+	//		System.out.println("New hash " + hash);
 			this.writeToIndexFile(data, Long.parseLong(ptr.toString()));
 			index = index + 2;	
 		}
 
 
 		//System.out.println("THIS ROUND IS" + this.round);
-		System.out.println("NP = " + this.nextPointer + ". NB = " + this.numberOfBuckets + ". R = " + this.round);
+	//	System.out.println("NP = " + this.nextPointer + ". NB = " + this.numberOfBuckets + ". R = " + this.round);
 		if(this.nextPointer == this.numberOfBuckets * (this.round)){
-			System.out.println("******************** " + this.nextPointer );
+	//		System.out.println("******************** " + this.nextPointer );
 			this.nextPointer = 0;
 		//	this.numberOfBuckets = 2 * this.numberOfBuckets;
-			System.out.println("num buck " + this.numberOfBuckets);
-			System.out.println(this.numberOfBuckets * (this.round + 1) - 1 + "aaaaa");
+	//		System.out.println("num buck " + this.numberOfBuckets);
+	//		System.out.println(this.numberOfBuckets * (this.round + 1) - 1 + "aaaaa");
 			
 			this.round++;
 		}
@@ -470,24 +470,24 @@ public class IndexFile {
 		// Calculate the bucket where we need to look 
 		// for RIDs
 		this.getHeaderInformationFromFile();
-		System.out.println(this.nextPointer + "NP");
+//		System.out.println(this.nextPointer + "NP");
 		Integer bucketToBeSearched = getHash(value);
-		System.out.println(bucketToBeSearched + " search bucket");
-		System.out.println(value + " value");
+	//	System.out.println(bucketToBeSearched + " search bucket");
+	//f	System.out.println(value + " value");
 		Long bucketToBeSearchedOffset = this.headerLength + (long) ((bucketToBeSearched)*sizeOfBucket());
 
 		ArrayList<Long> retValues = new ArrayList<Long>();
 
 		Bucket search = new Bucket(numberOfEntriesInBucket, (long)-1);
 		search = search.readBucketFromFile(path, bucketToBeSearchedOffset, dataType);
-		if(search == null){
-			System.out.println("read null bucket");
-		}
-		System.out.println(search.getCurrentSize());
+	//	if(search == null){
+	//		System.out.println("read null bucket");
+	//	}
+	//	System.out.println(search.getCurrentSize());
 		do{ // Read the Index bucket and all the overflow buckets.
 			for (int i = 0 ; i <search.getCurrentSize() ; i++){
 				// for each bucket - read all the data values.
-				System.out.println("foudn value " + search.data[i][0]);
+		//		System.out.println("foudn value " + search.data[i][0]);
 				//		System.out.println(search.data[i][0].getClass());
 				if (search.data[i][0].toString().toLowerCase().equals(value.toString().toLowerCase())){
 
@@ -498,7 +498,7 @@ public class IndexFile {
 				}
 			}
 			// Read the next Overflow bucket into memory
-			System.out.println(search);
+		//	System.out.println(search);
 			search = search.readBucketFromFile(overFlowPath, search.getOverflowOffset(), dataType);
 		}while (search != null);
 
