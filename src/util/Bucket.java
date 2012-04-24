@@ -84,7 +84,7 @@ public class Bucket {
 			 */
 			this.data[this.currentSize][0] = data;
 			this.data[this.currentSize][1] = ptr;
-			System.out.println(this.data[this.currentSize][1] + "ptrrrr");
+		//	System.out.println(this.data[this.currentSize][1] + "ptrrrr");
 			this.currentSize ++;
 			return true;
 		}
