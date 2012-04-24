@@ -73,7 +73,7 @@ public class OverflowFile {
 			Bucket b = new Bucket(Bucket.numberOfEntriesInBucket, (long) -1);
 			b = b.readBucketFromFile(path, returnValue, dataType);
 			this.freeBucketList = b.getOverflowOffset();
-			if (Config.DEBUG) System.out.println("Free Bucket returned");
+//			if (Config.DEBUG) System.out.println("Free Bucket returned");
 			writeHeaderInformationToFile();
 			return returnValue;
 		}
