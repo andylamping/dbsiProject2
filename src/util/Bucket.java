@@ -172,17 +172,19 @@ public class Bucket {
 		this.numberOfOverflowBuckets = numberOfOverflowBuckets;
 	}
 
-	// Inserts dummy values into the data of the bucket 
-	// so as to test the system.
-	public void writeData() {
-		// TODO Auto-generated method stub
-		this.setOverflowOffset((long)-1);
-		this.data [0][0]= -1; 	this.data[0][1] = -1;
-		this.data [1][0]= -1; 	this.data[1][1] = -1;
-		this.data [2][0]= -1;	this.data[2][1] = -1;
-		this.data [3][0]= -1;	this.data[3][1] = -1;
+	// Inserts dummy values into the data of the bucket
+    // so as to test the system.
+    public void writeData() {
+            // TODO Auto-generated method stub
+            this.setOverflowOffset((long)-1);
+            for (int i = 0; i < this.maxSize; i++)
+            {
+                    this.data [i][0]= -1;        
+                    this.data[i][1] = -1;
+            }
+            
 
-	}
+    }
 
 	public String toString(){
 		String result = "";
@@ -199,19 +201,19 @@ public class Bucket {
 	// this resets a bucket 
 	// called by split after all elements from the bucket have been plucked
 	public void resetBucket(String path, long offset, String datatype){
-		Bucket reset = new Bucket(numberOfEntriesInBucket, offset);
-		reset = reset.readBucketFromFile(path, offset, datatype);
-		reset.setOverflowOffset((long)-1);
-		reset.setNumberOfOverflowBuckets(0);
-		reset.setCurrentSize(0);
-		reset.data [0][0]= -1; 	reset.data[0][1] = -1;
-		reset.data [1][0]= -1; 	reset.data[1][1] = -1;
-		reset.data [2][0]= -1;	reset.data[2][1] = -1;
-		reset.data [3][0]= -1;	reset.data[3][1] = -1;
-		reset.writeBucketToFile(path, offset, datatype);
+        Bucket reset = new Bucket(numberOfEntriesInBucket, offset);
+        reset = reset.readBucketFromFile(path, offset, datatype);
+        reset.setOverflowOffset((long)-1);
+        reset.setNumberOfOverflowBuckets(0);
+        reset.setCurrentSize(0);
+        for (int i = 0 ; i < reset.maxSize ; i++){
+                reset.data [i][0] = -1;        
+                reset.data [i][1] = -1;
+        }
+        reset.writeBucketToFile(path, offset, datatype);
 
 
-	}
+}
 
 
 }
